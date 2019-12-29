@@ -14,7 +14,7 @@ namespace Raymarcher
     {
         public static string Root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Raymarcher\";
 
-        private static readonly string[] _FolderPaths = { @"Logs\" };
+        private static readonly string[] _FolderPaths = { @"Logs\", @"Screenshots\" };
 
         //TODO: Automatically initialize at start
 
@@ -89,6 +89,7 @@ namespace Raymarcher
 
     public enum FolderType
     {
-        Logs
+        Logs,
+        Screenshots
     }
 }

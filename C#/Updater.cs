@@ -18,8 +18,8 @@ namespace Raymarcher
             Malleable m = new Malleable();
             Camera.Main = m.AddModule<Camera>();
             m.AddModule<Mover>();
+            m.AddModule<PlanetSpawner>();
 
-            new Sphere() { Position = Vector3D.Forward * 1D};
 
             Task.Factory.StartNew(() => UpdateLoop()).ConfigureAwait(false);
             Task.Factory.StartNew(() => FixedUpdateLoop()).ConfigureAwait(false);
@@ -96,6 +96,7 @@ namespace Raymarcher
         internal static UpdaterDelegate OnUpdate;
         internal static UpdaterDelegate OnPostUpdate;
         internal static UpdaterDelegate OnEndUpdate;
+        internal static UpdaterDelegate OnPostRender;
 
         internal static UpdaterDelegate OnFixedUpdate;
 
@@ -103,7 +104,7 @@ namespace Raymarcher
         {
             try
             {
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     mod.FixedUpdate();
                 }
@@ -119,45 +120,51 @@ namespace Raymarcher
             {
                 if (OnPreUpdate != null)
                     OnPreUpdate.Invoke();
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.PreUpdate();
                 }
                 if (OnUpdate != null)
                     OnUpdate.Invoke();
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.Update();
                 }
                 if (OnPostUpdate != null)
                     OnPostUpdate.Invoke();
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.PostUpdate();
                 }
                 if (OnEndUpdate != null)
                     OnEndUpdate.Invoke();
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.EndUpdate();
                 }
 
-                foreach (Module mod in Module._LoadedModules)
+                foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.OnCameraRender();
                 }
-
-                foreach (Module mod in Module._LoadedModules)
+                if (OnPostRender != null)
+                    OnPostRender.Invoke();
+                /*foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.OnCameraRender();
-                }
+                }*/
 
+                Element._LoadedElements.AddRange(Element._SpawnNextFrame);
+                Element._SpawnNextFrame = new List<Element>();
+
+                Module._LoadedModules.AddRange(Module._LoadNextFrame);
+                Module._LoadNextFrame = new List<Module>();
 
                 Entry.ExecuteOnMainThread(() =>
                 {

@@ -10,9 +10,11 @@ namespace Raymarcher
     {
         internal static List<Module> _LoadedModules = new List<Module>();
 
+        internal static List<Module> _LoadNextFrame = new List<Module>();
+
         public Module() : base()
         {
-            _LoadedModules.Add(this);
+            _LoadNextFrame.Add(this);
         }
 
         public override void Destroy()
@@ -23,6 +25,7 @@ namespace Raymarcher
 
         public Malleable Malleable { get; internal set; }
 
+        internal protected virtual void OnCreation() { }
         internal protected virtual void PreUpdate() { }
         internal protected virtual void Update() { }
         internal protected virtual void PostUpdate() { }

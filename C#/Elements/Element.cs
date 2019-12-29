@@ -9,16 +9,19 @@ namespace Raymarcher
 { 
     public class Element
     {
+
         internal static List<Element> _LoadedElements = new List<Element>();
         internal static List<Element> _EnabledElements = new List<Element>();
+
+        internal static List<Element> _SpawnNextFrame = new List<Element>();
         public Element(string name)
         {
             this.Name = name;
-            _LoadedElements.Add(this);
+            _SpawnNextFrame.Add(this);
         }
         public Element()
         {
-            _LoadedElements.Add(this);
+            _SpawnNextFrame.Add(this);
         }
 
         public Guid GUID { get; private set; } = Guid.NewGuid();

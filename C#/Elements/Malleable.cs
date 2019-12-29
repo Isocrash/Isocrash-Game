@@ -25,6 +25,12 @@ namespace Raymarcher
             }
         }
 
+        public Vector3D Translate(Vector3D translation)
+        {
+            Position += translation;
+            return Position;
+        }
+
 
         public override void Destroy()
         {
@@ -42,8 +48,9 @@ namespace Raymarcher
         public T AddModule<T>() where T : Module
         {
             T mod = (T)Activator.CreateInstance(typeof(T));
-            mod.Malleable = this;
             _Modules.Add(mod);
+            mod.Malleable = this;
+            mod.OnCreation();
             return mod;
         }
         public T GetModule<T>() where T : Module
