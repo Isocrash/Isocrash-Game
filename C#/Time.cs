@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Voxine
+namespace Raymarcher
 {
     public static class Time
     {

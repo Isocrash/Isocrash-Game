@@ -7,7 +7,7 @@ using System.Drawing;
 using Hybridizer.Runtime.CUDAImports;
 using System.Diagnostics;
 
-namespace Voxine
+namespace Raymarcher
 {
     public class Camera : Element
     {

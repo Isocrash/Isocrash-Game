@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
 
-namespace Voxine
+namespace Raymarcher
 {
     internal static class Entry
     {

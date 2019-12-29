@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Voxine
+namespace Raymarcher
 {
     public class Primitive : Element
     {

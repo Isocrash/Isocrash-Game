@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 using SFile = System.IO.File;
-using VFile = Voxine.File;
+using VFile = Raymarcher.File;
 
-namespace Voxine
+namespace Raymarcher
 {
     public static class File
     {
-        public static string Root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Voxine\";
+        public static string Root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Raymarcher\";
 
         private static readonly string[] _FolderPaths = { @"Logs\" };
 

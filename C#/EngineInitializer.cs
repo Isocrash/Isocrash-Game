@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Voxine
+namespace Raymarcher
 {
     /// <summary>
     /// Enables the engine to execute a method when the engine starts.

@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 
-namespace Voxine
+namespace Raymarcher
 {
     public class GPUCamera
     {

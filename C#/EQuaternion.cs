@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Numerics;
 using Hybridizer.Runtime.CUDAImports;
 
-namespace Voxine
+namespace Raymarcher
 {
     public static class EQuaternion
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace Voxine
+namespace Raymarcher
 {
     [Serializable]
     public struct Colour

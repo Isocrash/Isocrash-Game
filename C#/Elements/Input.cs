@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Forms;
 using FCursor = System.Windows.Forms.Cursor;
 
-namespace Voxine
+namespace Raymarcher
 {
     public enum CursorLockMode
     {

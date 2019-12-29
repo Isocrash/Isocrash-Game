@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 
-namespace Voxine
+namespace Raymarcher
 {
     public static class Imaging
     {

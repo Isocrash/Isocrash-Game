@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace Voxine
+namespace Raymarcher
 {
     internal static class Updater
     {

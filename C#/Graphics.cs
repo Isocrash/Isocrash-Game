@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace Voxine
+namespace Raymarcher
 {
     public static class Graphics
     {

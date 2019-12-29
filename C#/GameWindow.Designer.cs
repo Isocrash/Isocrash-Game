@@ -1,4 +1,4 @@
-﻿namespace Voxine
+﻿namespace Raymarcher
 {
     partial class GameWindow
     {
