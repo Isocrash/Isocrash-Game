@@ -9,7 +9,6 @@ namespace Raymarcher
 { 
     public class Element
     {
-        
         public Element()
         {
             Sandbox.NextToSpawn.Add(this);
@@ -21,7 +20,6 @@ namespace Raymarcher
             Modules.Add(mod);
             return mod;
         }
-
         public T GetModule<T>() where T : Module
         {
             foreach (Module mod in Modules) if (mod is T module) return module;

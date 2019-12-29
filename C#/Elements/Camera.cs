@@ -13,7 +13,7 @@ namespace Raymarcher
     {
         //public static List<Camera> Cameras { get; set; } = new List<Camera>();
         public static Camera Main { get; set; }
-        public Vector2D ClipPlanes { get; set; } = new Vector2D(0D, 1000D);
+        public Vector2D ClipPlanes { get; set; } = new Vector2D(0D, 10D);
         public double Size { get; set; } = 5D;
         public double FieldOfView = 70D;
         public Colour ClearColour { get; set; } = new Colour(149, 192, 232);//new Colour(49, 77, 121);
@@ -34,11 +34,8 @@ namespace Raymarcher
         }
         private Bitmap render;
 
-        Stopwatch sw = new Stopwatch();
         public Bitmap RenderImage()
         {
-            sw.Reset();
-            sw.Start();
             Vector2I res = Graphics.GetRenderResolution();
 
             byte[] pixels = null;
@@ -53,18 +50,12 @@ namespace Raymarcher
                     {
                         try
                         {
-
-                            //pixels = GPUCamera.RenderCPU();
-
                             pixels = GPUCamera.Render(this);
-                            //pixels = new byte[res.x * res.y * 3];
-
                         }
                         catch(Exception e)
                         {
                             Log.Print(e.Message + "\n" + e.StackTrace);
                         }
-                        //pixels = new byte[];
                     }
                     break;
                 default:
@@ -75,8 +66,6 @@ namespace Raymarcher
             
             render = Imaging.RawToImage(pixels, res.x, res.y);
 
-            sw.Stop();
-            Log.Print("Render time of camera: " + sw.ElapsedMilliseconds + "ms");
             return render;
         }
 
