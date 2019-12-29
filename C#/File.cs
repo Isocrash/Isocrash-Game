@@ -17,7 +17,7 @@ namespace Raymarcher
         private static readonly string[] _FolderPaths = { @"Logs\" };
 
         //TODO: Automatically initialize at start
-        [EngineInitializer(0)]
+
         public static void Initialize()
         {
             if(!Directory.Exists(Root))

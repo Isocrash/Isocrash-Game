@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Raymarcher
 {
-    public class Primitive : Element
+    public class Primitive : Malleable
     {
         public virtual double DistanceFromSurface(Vector3D point) { return 0D; }
         public virtual double DistanceFromSurfaceSquared(Vector3D point) { return 0D; }

@@ -9,134 +9,54 @@ namespace Raymarcher
 { 
     public class Element
     {
+        internal static List<Element> _LoadedElements = new List<Element>();
+        internal static List<Element> _EnabledElements = new List<Element>();
+        public Element(string name)
+        {
+            this.Name = name;
+            _LoadedElements.Add(this);
+        }
         public Element()
         {
-            Sandbox.NextToSpawn.Add(this);
+            _LoadedElements.Add(this);
         }
 
-        public T AddModule<T>() where T : Module
-        {
-            T mod = (T)Activator.CreateInstance(typeof(T));
-            Modules.Add(mod);
-            return mod;
-        }
-        public T GetModule<T>() where T : Module
-        {
-            foreach (Module mod in Modules) if (mod is T module) return module;
-            return null;
-        }
-        public T[] GetModules<T>() where T : Module
-        {
-            List<T> modules = new List<T>();
-
-            foreach (Module mod in Modules) if (mod is T module) modules.Add(module);
-
-            if (modules.Count == 0) return null;
-
-            return modules.ToArray();
-        }
-        public T AddOrGetModule<T>() where T : Module
-        {
-            T module = GetModule<T>();
-
-            if (module) return module;
-
-            return AddModule<T>();
-        }
-
-        protected internal List<Module> Modules = new List<Module>();
-
+        public Guid GUID { get; private set; } = Guid.NewGuid();
         public string Name { get; set; } = "Element";
 
-        public Element Parent { get; set; } = null;
-        public Vector3D Position { get; set; } = Vector3D.Null;
-        public Quaternion Rotation { get; set; }
-        public Vector3D Scale { get; set; } = Vector3D.Positive;
+        public bool Enabled
+        {
+            get
+            {
+                return _Enabled;
+            }
 
-        public int Layer { get; set; } = 0;
+            set
+            {
+                // If the element was not enabled and Enabled is set to true,
+                // add it to the loaded list.
+                //
+                // Otherwise, remove it from it.
+                if(value && !_Enabled)
+                {
+                    _EnabledElements.Add(this);
+                }
 
-        internal protected virtual void PreUpdate() { }
-        public virtual void Update() { }
-        public virtual void PostUpdate() { }
-        public virtual void FixedUpdate() { }
-        internal protected virtual void EndUpdate() { }
+                else
+                {
+                    _EnabledElements.Remove(this);
+                }
+
+                _Enabled = value;
+            }
+        }
+        private bool _Enabled = true;
+
 
         public virtual void Destroy()
         {
-            Sandbox.LoadedElements.Remove(this);
-        }
-
-        public static Element Closest(Vector3D position)
-        {
-            double minDist = Camera.Main.ClipPlanes.y;
-            Element minEl = null;
-
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                Primitive m = element as Primitive;
-
-                if (m == null) continue;
-
-                double distance = m.DistanceFromSurface(position);
-
-                if (distance < minDist)
-                {
-                    minEl = element;
-                    minDist = distance;
-                }
-            }
-
-            return minEl;
-        }
-
-
-        /// <summary>
-        /// Find the closest collider distance from a position
-        /// </summary>
-        public static double ClosestDistance(Vector3D position)
-        {
-            double minDist = Camera.Main.ClipPlanes.y;
-
-            foreach(Element element in Sandbox.LoadedElements)
-            {
-                Primitive m = element as Primitive;
-
-                if (m == null) continue;
-
-                double distance = m.DistanceFromSurface(position);
-
-                if (distance < minDist)
-                {
-                    minDist = distance;
-                }
-            }
-
-            return minDist;
-        }
-
-        /// <summary>
-        /// Find the closest collider distance from a position
-        /// </summary>
-        public static double ClosestDistanceSquared(Vector3D position)
-        {
-            double minDist = Camera.Main.ClipPlanes.y;
-            minDist *= minDist;
-
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                Primitive m = element as Primitive;
-
-                if (m == null) continue;
-
-                double distance = m.DistanceFromSurfaceSquared(position);
-
-                if (distance < minDist)
-                {
-                    minDist = distance;
-                }
-            }
-
-            return Math.Sqrt(minDist);
+            _LoadedElements.Remove(this);
+            if (Enabled) _EnabledElements.Remove(this);
         }
 
         public static implicit operator bool(Element exists)

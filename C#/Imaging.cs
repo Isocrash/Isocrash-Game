@@ -13,16 +13,8 @@ namespace Raymarcher
 {
     public static class Imaging
     {
-        static Stopwatch sw;
-
-        [EngineInitializer(1036)]
-        public static void Init()
-        {
-            sw = new Stopwatch();
-        }
         public static Bitmap RawToImage(byte[] pixels, int width, int height)
         {
-            sw.Start();
             Vector2I res = Graphics.GetRenderResolution();
             Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 
@@ -40,10 +32,6 @@ namespace Raymarcher
             }
 
             bmp.UnlockBits(bmpData);
-
-            sw.Stop();
-            Log.Print("Image creation time from bytes: " + sw.ElapsedMilliseconds + "ms " + new Vector2I(width, height));
-            sw.Reset();
 
             return bmp;
         }

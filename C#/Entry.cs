@@ -17,8 +17,6 @@ namespace Raymarcher
         {
             File.Initialize();
             Log.Initialize();
-
-            AppDomain.CurrentDomain.AppendPrivatePath(@"bin\");
             try
             {
                 EngineInitializer.Fire();

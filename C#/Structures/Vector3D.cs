@@ -536,6 +536,11 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
         return new Vector3D(v1.x / v2.x, v1.y / v2.y, v1.z / v2.z);
     }
 
+    public static Vector3D operator *(Vector3D point, Quaternion rotation)
+    {
+        return rotation * point;
+    }
+
 
     // Shamefully copy pasted from 
     // https://github.com/Unity-Technologies/UnityCsReference/blob/5bc2902a12bd9f919e03a60f1f1ffffe5c31204c/Runtime/Export/Math/Quaternion.cs#L89

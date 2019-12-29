@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Raymarcher
 {
-    public class Light : Element
+    public class Light : Module
     {
         public static Light Main { get; set; }
 

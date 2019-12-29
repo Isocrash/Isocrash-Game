@@ -12,9 +12,15 @@ namespace Raymarcher
     {
         private static readonly Stopwatch _Watch = new Stopwatch();
 
-        [EngineInitializer(100001)]
+        [EngineInitializer(int.MaxValue - 10)]
         public static void InitializeThread()
         {
+            Malleable m = new Malleable();
+            Camera.Main = m.AddModule<Camera>();
+            m.AddModule<Mover>();
+
+            new Sphere() { Position = Vector3D.Forward * 1D};
+
             Task.Factory.StartNew(() => UpdateLoop()).ConfigureAwait(false);
             Task.Factory.StartNew(() => FixedUpdateLoop()).ConfigureAwait(false);
         }
@@ -37,42 +43,33 @@ namespace Raymarcher
 
                 if (timeToWait > 0)
                 {
-                    System.Threading.Thread.Sleep((int)(timeToWait * 1000));
+                    Thread.Sleep((int)(timeToWait * 1000));
                 }
             }
         }
 
-        static int noFrame = 0;
         private static void UpdateLoop()
         {
             try
             {
                 while (true)
                 {
-                    Log.Print("============================");
-                    Log.Print($"= FRAME UPDATE TRACER #{noFrame}   =");
-                    Log.Print("============================");
                     if (First && GameWindow.Instance != null)
                     {
                         Entry.ExecuteOnMainThread(() => Graphics.ResizeWindow(512, 512));
                         First = false;
                     }
 
-                    _Watch.Reset();
-                    _Watch.Start();
+                    //_Watch.Reset();
+                    //_Watch.Start();
                     UpdateElements();
-                    long elementTime = _Watch.ElapsedMilliseconds;
-                    _Watch.Reset();
-                    _Watch.Start();
-                    UpdateRenders();
-                    long rendersTime = _Watch.ElapsedMilliseconds;
-                    _Watch.Stop();
+                    //_Watch.Stop();
 
-                    Log.Print("Total update time: " + (elementTime + rendersTime) + "ms" + "(render: " + rendersTime + "ms)");
-                    double secs = _Watch.ElapsedMilliseconds / 1000D;
+                    
+                    //double secs = _Watch.ElapsedMilliseconds / 1000D;
 
 
-                    if (Graphics.FrameRateLimit != 0)
+                    /* (Graphics.FrameRateLimit != 0)
                     {
                         double limit = 1.0D / Graphics.FrameRateLimit;
 
@@ -80,18 +77,9 @@ namespace Raymarcher
 
                         if (timeToWait > 0)
                         {
-                            System.Threading.Thread.Sleep((int)(timeToWait * 1000));
+                            Thread.Sleep((int)(timeToWait * 1000));
                         }
-                    }
-
-                    if (OnUpdate != null)
-                        OnUpdate.Invoke();
-
-                    Log.Print("============================");
-                    Log.Print($"=   END OF FRAME UPDATE    =");
-                    Log.Print("============================");
-
-                    noFrame++;
+                    }*/
                 }
             }
             catch(Exception e)
@@ -104,105 +92,81 @@ namespace Raymarcher
 
         internal delegate void UpdaterDelegate();
 
+        internal static UpdaterDelegate OnPreUpdate;
         internal static UpdaterDelegate OnUpdate;
+        internal static UpdaterDelegate OnPostUpdate;
+        internal static UpdaterDelegate OnEndUpdate;
+
         internal static UpdaterDelegate OnFixedUpdate;
 
         internal static void FixedUpdateElements()
         {
             try
             {
-                foreach (Element element in Sandbox.LoadedElements)
+                foreach (Module mod in Module._LoadedModules)
                 {
-                    element.FixedUpdate();
+                    mod.FixedUpdate();
                 }
 
                 if (OnFixedUpdate != null) OnFixedUpdate.Invoke();
 
             }
-            catch (Exception e) { Log.Print("ERROR " + e.Message + e.StackTrace); }
+            catch (Exception e) { Log.Print("ERROR " + e.Message + Environment.NewLine + e.StackTrace); }
         }
         internal static void UpdateElements()
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-
-            //Log.Print("==== PRE UPDATE ====");
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                //sw.Start();
-                element.PreUpdate();
-                /*Log.Print(element.Name + " preupdate time: " + sw.ElapsedMilliseconds + "ms");
-                sw.Stop();
-                sw.Reset();*/
-            }
-            //Log.Print("==== UPDATE ====");
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                //sw.Start();
-                element.Update();
-                //sw.Stop();
-                //Log.Print(element.Name + " update time: " + sw.ElapsedMilliseconds + "ms");
-                //sw.Reset();
-            }
-            //Log.Print("==== POST UPDATE ====");
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                //sw.Start();
-                element.PostUpdate();
-                //sw.Stop();
-                //Log.Print(element.Name + " post update time: " + sw.ElapsedMilliseconds + "ms");
-                //sw.Reset();
-            }
-            //Log.Print("==== END UPDATE ====");
-            foreach (Element element in Sandbox.LoadedElements)
-            {
-                //sw.Start();
-                element.EndUpdate();
-                //sw.Stop();
-                //Log.Print(element.Name + " end update time: " + sw.ElapsedMilliseconds + "ms");
-                //sw.Reset();
-            }
-            Sandbox.LoadedElements.AddRange(Sandbox.NextToSpawn);
-            Sandbox.NextToSpawn = new List<Element>();
-            
-            
-        }
-        internal static void UpdateRenders()
-        {
             try
             {
-                Camera.Main.RenderImage();
+                if (OnPreUpdate != null)
+                    OnPreUpdate.Invoke();
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.PreUpdate();
+                }
+                if (OnUpdate != null)
+                    OnUpdate.Invoke();
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.Update();
+                }
+                if (OnPostUpdate != null)
+                    OnPostUpdate.Invoke();
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.PostUpdate();
+                }
+                if (OnEndUpdate != null)
+                    OnEndUpdate.Invoke();
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.EndUpdate();
+                }
 
-                Entry.ExecuteOnMainThread(() => {
-                    GameWindow.Instance.Render.Image = Camera.Main.Render;
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.OnCameraRender();
+                }
+
+                foreach (Module mod in Module._LoadedModules)
+                {
+                    if (!mod.Enabled) continue;
+                    mod.OnCameraRender();
+                }
+
+
+                Entry.ExecuteOnMainThread(() =>
+                {
+                    GameWindow.Instance.Render.Image = Camera.Main.RenderImage;
+                    //Log.Print(Camera.Main.Malleable.Name);
                 });
             }
 
-            catch(Exception e) { Log.Print("ERROR " + e.Message); }
-        }
-    }
-
-    public static class TaskHelper
-    {
-        /// <summary>
-        /// Runs a TPL Task fire-and-forget style, the right way - in the
-        /// background, separate from the current thread, with no risk
-        /// of it trying to rejoin the current thread.
-        /// </summary>
-        public static void RunBg(Func<Task> fn)
-        {
-            Task.Run(fn).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Runs a task fire-and-forget style and notifies the TPL that this
-        /// will not need a Thread to resume on for a long time, or that there
-        /// are multiple gaps in thread use that may be long.
-        /// Use for example when talking to a slow webservice.
-        /// </summary>
-        public static void RunBgLong(Func<Task> fn)
-        {
-            Task.Factory.StartNew(fn, TaskCreationOptions.LongRunning)
-                .ConfigureAwait(false);
+            catch (Exception e) { Log.Print("ERROR " + e.Message + Environment.NewLine + e.StackTrace); }
         }
     }
 }
