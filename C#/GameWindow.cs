@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace Raymarcher
 {
     public partial class GameWindow : Form
@@ -24,6 +25,9 @@ namespace Raymarcher
         {
             MouseEventArgs args = (MouseEventArgs)e;
             Input.AddClicked(args.Button);
+
+            Input.CursorMode = CursorLockMode.Locked;
+            Input.ShowCursor = false;
         }
 
         private void GameWindow_Resize(object sender, EventArgs e)

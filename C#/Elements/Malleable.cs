@@ -15,13 +15,29 @@ namespace Raymarcher
         public Malleable Parent { get; set; } = null;
 
         public Vector3D Position { get; set; } = Vector3D.Null;
-        public Quaternion Rotation { get; set; } = EQuaternion.FromEuler(Vector3D.Null); //TODO : Use double quaternion system.
+        public Quaternion Rotation { get; set; } = EQuaternion.FromEuler(0,0,0); //TODO : Use double quaternion system.
         public Vector3D Scale { get; set; } = Vector3D.Positive;
-        public Vector3D LookDirection
+        public Vector3D Forward
         {
             get
             {
                 return Rotation * Vector3D.Forward;
+            }
+        }
+
+        public Vector3D Right
+        {
+            get
+            {
+                return Rotation * Vector3D.Right;
+            }
+        }
+
+        public Vector3D Up
+        {
+            get
+            {
+                return Rotation * Vector3D.Up;
             }
         }
 

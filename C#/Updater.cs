@@ -56,20 +56,20 @@ namespace Raymarcher
                 {
                     if (First && GameWindow.Instance != null)
                     {
-                        Entry.ExecuteOnMainThread(() => Graphics.ResizeWindow(512, 512));
+                        Entry.ExecuteOnMainThread(() => Graphics.ResizeWindow(1024, 1024));
                         First = false;
                     }
 
-                    //_Watch.Reset();
-                    //_Watch.Start();
+                    _Watch.Reset();
+                    _Watch.Start();
                     UpdateElements();
-                    //_Watch.Stop();
+                    _Watch.Stop();
 
                     
-                    //double secs = _Watch.ElapsedMilliseconds / 1000D;
+                    double secs = _Watch.ElapsedMilliseconds / 1000D;
 
 
-                    /* (Graphics.FrameRateLimit != 0)
+                    if (Graphics.FrameRateLimit != 0)
                     {
                         double limit = 1.0D / Graphics.FrameRateLimit;
 
@@ -79,7 +79,7 @@ namespace Raymarcher
                         {
                             Thread.Sleep((int)(timeToWait * 1000));
                         }
-                    }*/
+                    }
                 }
             }
             catch(Exception e)
@@ -166,6 +166,7 @@ namespace Raymarcher
                 Module._LoadedModules.AddRange(Module._LoadNextFrame);
                 Module._LoadNextFrame = new List<Module>();
 
+                
                 Entry.ExecuteOnMainThread(() =>
                 {
                     GameWindow.Instance.Render.Image = Camera.Main.RenderImage;

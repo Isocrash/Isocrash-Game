@@ -30,7 +30,7 @@ namespace Raymarcher
         private static List<MouseButtons> _NextUpdateClicked = new List<MouseButtons>();
         private static List<MouseButtons> _ClickedThisFrame = new List<MouseButtons>();
 
-        public static CursorLockMode CursorMode = CursorLockMode.Free;
+        public static CursorLockMode CursorMode = CursorLockMode.Locked;
         public static bool ShowCursor
         {
             get
@@ -130,8 +130,6 @@ namespace Raymarcher
                     case CursorLockMode.Locked:
                         {
                             if (!Graphics.ApplicationIsActivated()) return;
-
-                            ShowCursor = false;
 
                             GameWindow w = GameWindow.Instance;
 

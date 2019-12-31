@@ -317,10 +317,12 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
             return new Vector3D(x / l, y / l, z / l);
         }
     }
+
     /// <summary>
     /// Transforms the vector to its direction.
     /// </summary>
     /// <returns>Returns itself.</returns>
+    [Hybridizer.Runtime.CUDAImports.Kernel]
     public Vector3D Normalize()
     {
         if (this == Vector3D.Null)
@@ -372,6 +374,7 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// </summary>
     /// <param name="a">First vector</param>
     /// <param name="b">Second vector</param>
+    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D Max(Vector3D a, Vector3D b)
     {
         return a.Length > b.Length ? a : b;
@@ -381,6 +384,7 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// </summary>
     /// <param name="a">First vector</param>
     /// <param name="b">Second vector</param>
+    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D Min(Vector3D a, Vector3D b)
     {
         return a.Length < b.Length ? a : b;
@@ -389,9 +393,10 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// Get the absolute value of a vector
     /// </summary>
     /// <param name="v">The vector</param>
+    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D Abs(Vector3D v)
     {
-        return new Vector3D(Math.Abs(v.x), Math.Abs(v.y), Math.Abs(v.z));
+        return new Vector3D(Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.x), Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.y), Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.z));
     }
 
     public static Vector3D Round(Vector3D v, int decimals)

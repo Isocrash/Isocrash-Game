@@ -264,6 +264,12 @@ public struct Vector2D// : IComparable, IFormattable, IComparable<Vector2D>, IEq
 
         return this;
     }
+
+    [Hybridizer.Runtime.CUDAImports.Kernel]
+    public static Vector2D Abs(Vector2D v)
+    {
+        return new Vector2D(Math.Abs(v.x), Math.Abs(v.y));
+    }
     #endregion
 
     #region Interface Implementations
@@ -372,7 +378,10 @@ public struct Vector2D// : IComparable, IFormattable, IComparable<Vector2D>, IEq
     {
         return new Vector2D(v1.x - v2.x, v1.y - v2.y);
     }
-
+    public static Vector2D operator *(double n, Vector2D v)
+    {
+        return v * n;
+    }
     public static Vector2D operator *(Vector2D v, double n)
     {
         return new Vector2D(v.x * n, v.y * n);

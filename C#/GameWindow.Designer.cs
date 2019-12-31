@@ -58,9 +58,9 @@
             this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Raymarcher";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameWindow_Closing);
             this.LostFocus += new System.EventHandler(this.GameWindow_LostFocus);
             this.Resize += new System.EventHandler(this.GameWindow_Resize);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameWindow_Closing);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
 

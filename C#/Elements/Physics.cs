@@ -16,6 +16,8 @@ namespace Raymarcher
 
         public Vector3D Velocity { get; set; } = Vector3D.Null;
 
+        public bool Freeze = false;
+
         
         protected internal override void FixedUpdate()
         {
@@ -25,8 +27,11 @@ namespace Raymarcher
                 Velocity += Gravity * Time.FixedDeltaTime;
             }
 
+            if(!Freeze)
+            {
+                this.Malleable.Translate(Velocity * Time.FixedDeltaTime);
+            }
             
-            this.Malleable.Translate(Velocity * Time.FixedDeltaTime);
         }
     }
 }
