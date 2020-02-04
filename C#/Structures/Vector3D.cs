@@ -546,6 +546,11 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
         return rotation * point;
     }
 
+    public static explicit operator Vector3(Vector3D v)
+    {
+        return new Vector3((float)v.x, (float)v.y, (float)v.z);
+    }
+
 
     // Shamefully copy pasted from 
     // https://github.com/Unity-Technologies/UnityCsReference/blob/5bc2902a12bd9f919e03a60f1f1ffffe5c31204c/Runtime/Export/Math/Quaternion.cs#L89

@@ -135,26 +135,42 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <Compile Include="CUDA\CShape.cs" />
+    <Compile Include="Rendering\CameraSetting.cs" />
     <Compile Include="Elements\Camera.cs" />
     <Compile Include="Elements\Malleable.cs" />
     <Compile Include="Elements\Element.cs" />
     <Compile Include="Elements\Physics.cs" />
+    <Compile Include="Elements\Plane.cs" />
+    <Compile Include="Elements\Primitive.cs" />
+    <Compile Include="Elements\Sphere.cs" />
+    <Compile Include="File.cs" />
     <Compile Include="GPUCamera.cs" />
     <Compile Include="EngineInitializer.cs" />
     <Compile Include="Entry.cs" />
     <Compile Include="EQuaternion.cs" />
-    <Compile Include="File.cs" />
-    <Compile Include="GetReferencedAssemblies.cs" />
+    <Compile Include="Rendering\GraphicalObject.cs" />
     <Compile Include="Graphics.cs" />
     <Compile Include="Imaging.cs" />
     <Compile Include="Elements\Module.cs" />
+    <Compile Include="Rendering\LightSetting.cs" />
+    <Compile Include="Rendering\Material.cs" />
+    <Compile Include="Materials\Material.cs" />
+    <Compile Include="Materials\Skybox.cs" />
+    <Compile Include="Rendering\Ray.cs" />
+    <Compile Include="RayMath.cs" />
+    <Compile Include="Rendering\Renderer.cs" />
+    <Compile Include="Rendering\RenderSetting.cs" />
+    <Compile Include="Rendering\RMath.cs" />
+    <Compile Include="Rendering\Volumes\Ball.cs" />
+    <Compile Include="Rendering\Volumes\Box.cs" />
+    <Compile Include="Rendering\Volumes\Volume.cs" />
     <Compile Include="Screenshot.cs" />
+    <Compile Include="Rendering\Shader.cs" />
+    <Compile Include="Rendering\ShaderOutput.cs" />
     <Compile Include="Structures\Colour.cs" />
     <Compile Include="Elements\Light.cs" />
     <Compile Include="Log.cs" />
-    <Compile Include="Elements\Primitive.cs" />
-    <Compile Include="Renderer.cs" />
+    <Compile Include="Processors.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="GameWindow.cs">
       <SubType>Form</SubType>
@@ -163,8 +179,6 @@
       <DependentUpon>GameWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Elements\Plane.cs" />
-    <Compile Include="Elements\Sphere.cs" />
     <Compile Include="Local Only\Mover.cs" />
     <Compile Include="Local Only\Planet.cs" />
     <Compile Include="Time.cs" />
@@ -206,6 +220,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Rendering\Shaders\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

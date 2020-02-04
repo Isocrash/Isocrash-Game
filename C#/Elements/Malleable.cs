@@ -60,6 +60,18 @@ namespace Raymarcher
             base.Destroy();
         }
 
+        public static Malleable Find(string name)
+        {
+            foreach (Malleable m in Malleable._LoadedElements)
+            {
+                if (m == null) continue;
+
+                if (m.Name == name) return m;
+            }
+
+            return null;
+        }
+
         #region Modules
         public T AddModule<T>() where T : Module
         {

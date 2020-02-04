@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
+using System.Drawing;
 
 namespace Raymarcher
 {
@@ -17,6 +18,7 @@ namespace Raymarcher
         {
             File.Initialize();
             Log.Initialize();
+
             try
             {
                 EngineInitializer.Fire();
@@ -25,8 +27,6 @@ namespace Raymarcher
             {
                 Log.InstantPrint(e);
             }
-
-            //Updater.Initialize();
         }
 
 
@@ -45,9 +45,7 @@ namespace Raymarcher
                 if (GameWindow.Instance != null)
                     GameWindow.Instance.Render.Invoke(action);
             }
-
-            catch(Exception e) { }
-            
+            catch { }
         }
     }
 }

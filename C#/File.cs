@@ -13,10 +13,7 @@ namespace Raymarcher
     public static class File
     {
         public static string Root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Raymarcher\";
-
         private static readonly string[] _FolderPaths = { @"Logs\", @"Screenshots\" };
-
-        //TODO: Automatically initialize at start
 
         public static void Initialize()
         {
@@ -32,8 +29,6 @@ namespace Raymarcher
                     Directory.CreateDirectory(Root + _FolderPaths[i]);
                 }
             }
-
-            //Log.Print("File system initialized");
         }
 
         public static string GetPath(FolderType type)
@@ -64,10 +59,7 @@ namespace Raymarcher
                 else return;
             };
 
-            /*if (Directory.Exists(Path.Combine(path, @"\..")))
-            {*/
-                SFile.Create(path);
-            //}
+            SFile.Create(path);
         }
 
         public static void Archive(string localPath, string localArchivePath)
@@ -79,7 +71,6 @@ namespace Raymarcher
 
                 using (ZipArchive archive = ZipFile.Open(zipPath, ZipArchiveMode.Create))
                 {
-                    //ZipFile.CreateFromDirectory(path, zipPath);
                 }
 
                 Directory.Delete(path, true);

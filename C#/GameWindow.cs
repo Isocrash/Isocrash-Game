@@ -49,5 +49,11 @@ namespace Raymarcher
             
             //e.Cancel = true;  
         }
+
+        private void GameWindow_Load(object sender, EventArgs e)
+        {
+            this.Controls.Add(this.Render);
+            this.Render.Controls.Add(lbFPS);
+        }
     }
 }

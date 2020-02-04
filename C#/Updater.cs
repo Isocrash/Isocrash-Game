@@ -17,12 +17,27 @@ namespace Raymarcher
         {
             Malleable m = new Malleable();
             Camera.Main = m.AddModule<Camera>();
+            Camera.Main.Malleable.Position = new Vector3D(0, 0, -1);
             m.AddModule<Mover>();
             m.AddModule<PlanetSpawner>();
 
+            Malleable light = new Malleable() { Name = "Sun" };
+            Light.Main = light.AddModule<Light>();
+            light.Rotation = EQuaternion.FromEuler(0, 0, 0);
 
-            Task.Factory.StartNew(() => UpdateLoop()).ConfigureAwait(false);
-            Task.Factory.StartNew(() => FixedUpdateLoop()).ConfigureAwait(false);
+            Thread tf = new Thread(FixedUpdateLoop);
+            tf.Priority = ThreadPriority.Highest;
+            tf.IsBackground = true;
+            tf.Start();
+
+            Thread tnf = new Thread(UpdateLoop);
+            tnf.Priority = ThreadPriority.Highest;
+            tnf.IsBackground = true;
+            tnf.Start();
+
+            // Task.Factory.StartNew(() => FixedUpdateLoop()).ConfigureAwait(false);
+            // Task.Factory.StartNew(() => UpdateLoop()).ConfigureAwait(false);
+
         }
 
 
@@ -33,18 +48,17 @@ namespace Raymarcher
         {
             while (true)
             {
+
+
                 _FixedWatch.Reset();
                 _FixedWatch.Start();
                 FixedUpdateElements();
                 _FixedWatch.Stop();
 
-                double secs = _FixedWatch.ElapsedMilliseconds / 1000;
+                double secs = _FixedWatch.ElapsedMilliseconds / 1000D;
                 double timeToWait = Time.FixedDeltaTime - secs;
 
-                if (timeToWait > 0)
-                {
-                    Thread.Sleep((int)(timeToWait * 1000));
-                }
+                if (timeToWait > 0) Thread.Sleep((int)(timeToWait * 1000));
             }
         }
 
@@ -65,7 +79,7 @@ namespace Raymarcher
                     UpdateElements();
                     _Watch.Stop();
 
-                    
+
                     double secs = _Watch.ElapsedMilliseconds / 1000D;
 
 
@@ -82,12 +96,12 @@ namespace Raymarcher
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Log.InstantPrint(e.Message + Environment.NewLine + e.StackTrace);
             }
         }
-        
+
         private static readonly Stopwatch _FixedWatch = new Stopwatch();
 
         internal delegate void UpdaterDelegate();
@@ -166,7 +180,7 @@ namespace Raymarcher
                 Module._LoadedModules.AddRange(Module._LoadNextFrame);
                 Module._LoadNextFrame = new List<Module>();
 
-                
+
                 Entry.ExecuteOnMainThread(() =>
                 {
                     GameWindow.Instance.Render.Image = Camera.Main.RenderImage;

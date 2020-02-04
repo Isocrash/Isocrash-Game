@@ -30,23 +30,45 @@ namespace Raymarcher
 
             set
             {
+                _RenderResolution = value;
                 Ratio = value.x / (double)value.y;
             }
         }
-        private static Vector2I _RenderResolution = new Vector2I(480, 270);
+
+        public static PictureBoxSizeMode RenderSizeMode
+        {
+            get
+            {
+                return GameWindow.Instance.Render.SizeMode;
+            }
+
+            set
+            {
+                GameWindow.Instance.Render.SizeMode = value;
+            }
+        }
+
+
+
+        private static Vector2I _RenderResolution = new Vector2I(128, 128);
         public static double Ratio { get; internal set; } = 1.0D;
         public static int FrameRateLimit { get; set; } = 0;
+
+
+
+        public static RenderProc Processor { get; set; } = RenderProc.NativeCPU;
 
         private static Vector2I PreFullScreenResolution;
         private static Vector2I PreFullScreenPosition;
         private static FormWindowState PreFullScreenState;
 
 
-        public static LockMode ResolutionLockMode { get; set; } = LockMode.Size;
+        public static LockMode ResolutionLockMode { get; set; } = LockMode.None;
         public static WindowMode RenderMode { get; private set; } = WindowMode.Windowed;
 
         public static void SetWindowMode(WindowMode mode)
         {
+
             if (GameWindow.Instance == null) return;
 
             Entry.ExecuteOnMainThread(() =>
@@ -114,7 +136,7 @@ namespace Raymarcher
 
         internal static Vector2I GetRenderResolution()
         {
-            if(ResolutionLockMode == LockMode.None)
+            if (ResolutionLockMode == LockMode.None)
             {
                 return _RenderResolution;
             }
@@ -204,6 +226,12 @@ namespace Raymarcher
             Windowed,
             FullScreenWindowed,
             FullScreen
+        }
+
+        public enum RenderProc
+        {
+            NativeCPU,
+            CUDA
         }
     }
 }

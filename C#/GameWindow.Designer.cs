@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             this.Render = new System.Windows.Forms.PictureBox();
+            this.lbFPS = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.Render)).BeginInit();
             this.SuspendLayout();
             // 
@@ -42,15 +43,29 @@
             this.Render.Margin = new System.Windows.Forms.Padding(0);
             this.Render.Name = "Render";
             this.Render.Size = new System.Drawing.Size(1280, 719);
+            this.Render.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
             this.Render.Click += new System.EventHandler(this.RenderPictureBox_Click);
+            // 
+            // lbFPS
+            // 
+            this.lbFPS.AutoSize = true;
+            this.lbFPS.BackColor = System.Drawing.Color.Transparent;
+            this.lbFPS.Cursor = System.Windows.Forms.Cursors.Default;
+            this.lbFPS.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbFPS.Location = new System.Drawing.Point(12, 9);
+            this.lbFPS.Name = "lbFPS";
+            this.lbFPS.Size = new System.Drawing.Size(151, 37);
+            this.lbFPS.TabIndex = 1;
+            this.lbFPS.Text = "XXX FPS";
             // 
             // GameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1280, 719);
+            this.Controls.Add(this.lbFPS);
             this.Controls.Add(this.Render);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -59,15 +74,18 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Raymarcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameWindow_Closing);
+            this.Load += new System.EventHandler(this.GameWindow_Load);
             this.LostFocus += new System.EventHandler(this.GameWindow_LostFocus);
             this.Resize += new System.EventHandler(this.GameWindow_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.Render)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
         internal System.Windows.Forms.PictureBox Render;
+        internal System.Windows.Forms.Label lbFPS;
     }
 }
 

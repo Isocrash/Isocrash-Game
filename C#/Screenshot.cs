@@ -15,7 +15,7 @@ namespace Raymarcher
         [EngineInitializer(1484)]
         public static void Init()
         {
-            Updater.OnUpdate += CheckForScreens;
+            Updater.OnFixedUpdate += CheckForScreens;
             Updater.OnPostRender += SaveScreen;
         }
 
@@ -35,8 +35,7 @@ namespace Raymarcher
 
         public static void SaveScreen()
         {
-            
-            if(ScreenshotAsked)
+            if (ScreenshotAsked)
             {
                 SaveScreenshot();
             }

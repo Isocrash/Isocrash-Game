@@ -17,10 +17,10 @@ namespace Raymarcher
         public static Camera Main { get; set; }
         internal static List<Camera> Cameras { get; set; } = new List<Camera>();
 
-        public Vector2D ClipPlanes { get; set; } = new Vector2D(0D, 1000D);
-        public Colour ClearColour { get; set; } = new Colour(149, 192, 232);
-        public double Precision { get; set; } = 0.001D;
-        public double FieldOfView { get; set; } = 50D;
+        public Vector2D ClipPlanes { get; set; } = new Vector2D(0D, 1E+3);
+        public Colour32 ClearColour { get; set; } = new Colour32(149, 192, 232, 255);
+        public double Precision { get; set; } = 1E-3;
+        public double FieldOfView { get; set; } = 70D;
 
 
         public Bitmap RenderImage { get; private set; }
@@ -29,17 +29,14 @@ namespace Raymarcher
         {
             Vector2I resolution = Graphics.GetRenderResolution();
 
-            byte[] pixels = GPUCamera.Render(this);
+            RenderImage = Imaging.RawToImage(GPUCamera.Render(this), resolution.x, resolution.y);
 
-            RenderImage = Imaging.RawToImage(pixels, resolution.x, resolution.y);
-            
             return RenderImage;
         }
 
 
         protected internal override void OnCameraRender()
         {
-            //Log.Print(this.Malleable.Rotation.ToEuler());
             Render();
         }
 

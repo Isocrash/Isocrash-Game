@@ -8,11 +8,11 @@ namespace Raymarcher
 {
     class Sphere : Primitive
     {
-        public Colour Colour;
+        public Colour32 Colour;
 
         public Sphere() : base()
         {
-            Colour = new Colour(EngineInitializer.r.Next(256), EngineInitializer.r.Next(256), EngineInitializer.r.Next(256));
+            Colour = new Colour32(EngineInitializer.r.Next(256), EngineInitializer.r.Next(256), EngineInitializer.r.Next(256), 255);
         }
 
         public override double DistanceFromSurface(Vector3D position)

@@ -40,7 +40,7 @@ namespace Raymarcher
 
             set
             {
-                if(value)
+                if (value)
                 {
                     FCursor.Show();
                 }
@@ -93,8 +93,8 @@ namespace Raymarcher
 
         private static void PreUpdate()
         {
-            
-            if(Graphics.ApplicationIsActivated())
+
+            if (Graphics.ApplicationIsActivated())
             {
                 Entry.ExecuteOnMainThread(new Action(CalculateKeyInfos));
                 Entry.ExecuteOnMainThread(new Action(CalculateMouseInfos));
@@ -106,6 +106,10 @@ namespace Raymarcher
                 {
                     case CursorLockMode.Free:
                         {
+                            if (_ShowCursor)
+                            {
+                                FCursor.Show();
+                            }
                         }
                         break;
                     case CursorLockMode.Confined:
@@ -174,7 +178,7 @@ namespace Raymarcher
             CursorMovement = CursorPosition - previousCursorPosition;
 
             Scroll = SystemInformation.MouseButtons;
-            
+
         }
         private static void CalculateCursorPosition()
         {
@@ -194,7 +198,7 @@ namespace Raymarcher
         }
         private static void CalculateKeyInfos()
         {
-            
+
             _PressedDownKeys = new List<Key>();
             _PressedUpKeys = new List<Key>();
 
