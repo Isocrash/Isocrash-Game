@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hybridizer.Runtime.CUDAImports;
+ 
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
@@ -177,7 +177,7 @@ namespace Raymarcher
             }
         }
 
-        [EntryPoint]
+        //[EntryPoint]
         public static void GPUOpti(byte[] pixels, GPUSphere[] spheres, int n, GPUCamera camera)
         {
             Colour256 sunCol = camera.SunColour;
@@ -302,7 +302,7 @@ namespace Raymarcher
             });
         }
 
-        [Kernel]
+         
         public static Colour32 SkyboxColour(Vector3D direction, Vector3D sunDirection)
         {
 
@@ -348,22 +348,22 @@ namespace Raymarcher
 
 
 
-        [Kernel]
+         
         public static double Angle(Vector3D v1, Vector3D v2)
         {
             return Math.Acos(Scalar(v1, v2) / (Length(v1) * Length(v2))) * 180D / Math.PI;
         }
-        [Kernel]
+         
         public static float Angle(float3 v1, float3 v2)
         {
             return (float)Math.Acos(Scalar(v1, v2) / (Length(v1) * Length(v2))) * 180F / (float)Math.PI;
         }
-        [Kernel]
+         
         public static double Scalar(Vector3D u, Vector3D v)
         {
             return u.x * v.x + u.y * v.y + u.z * v.z;
         }
-        [Kernel]
+         
         public static float Scalar(float3 u, float3 v)
         {
             return u.x * v.x + u.y * v.y + u.z * v.z;
@@ -371,11 +371,11 @@ namespace Raymarcher
 
 
 
-        [Kernel]
+         
         public static Vector3D GetDir(GPUCamera cam, Vector2I pixel)
         {
             // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?http://www.scratchapixel.com/lessons/3d-basic-rendering/3d-viewing-pinhole-camera/how-pinhole-camera-works-part-1
-
+C:\Users\Arthur\source\repos\Raymarcher\Raymarcher\C#\bin\Debug\headers\raymath.h
             // Original pixel position in Raster space (Unnormalized screen space)
             // Normalized Device Coordinates of pixel
 
@@ -407,30 +407,30 @@ namespace Raymarcher
         }
 
         #region Math Utility
-        [Kernel]
+         
         public static double Acos(double a)
         {
             return 1D / HybMath.Cos(a);
         }
 
-        [Kernel]
+         
         public static float Acos(float a)
         {
             return 1F / HybMath.Cos(a);
         }
 
-        [Kernel]
+         
         public static double Tan(double a)
         {
             return HybMath.Sin(a) / HybMath.Cos(a);
         }
-        [Kernel]
+         
         public static double Atan(double a)
         {
             return 1 / Tan(a);//a / HybMath.Sqrt(1 + a * a);
         }
 
-        [Kernel]
+         
         public static Vector3D RotateAroundX(Vector3D dir, double a)
         {
             a *= 0.0174533D;
@@ -442,7 +442,7 @@ namespace Raymarcher
             return new Vector3D() { x = rx, y = ry, z = rz };
         }
 
-        [Kernel]
+         
         public static Vector3D RotateAroundY(Vector3D dir, double a)
         {
             a *= 0.0174533F;
@@ -455,7 +455,7 @@ namespace Raymarcher
         }
         #endregion
         #region folder
-        [Kernel]
+         
         public static GPUHitInfos Hit(Vector3D point, Vector3D dir, GPUSphere[] spheres, int n, GPUCamera camera)
         {
             Vector3D probe = point;
@@ -499,7 +499,7 @@ namespace Raymarcher
             return hit;
         }
 
-        [Kernel]
+         
         public static ClosestInfos Closest(Vector3D point, GPUSphere[] spheres, int n, GPUCamera cam)
         {
             ClosestInfos infos = new ClosestInfos();
@@ -529,7 +529,7 @@ namespace Raymarcher
             public int Index;
         }
 
-        [Kernel]
+         
         public static double DistanceToBox(Vector3D point, Vector3D c, Vector3D size)
         {
             return
@@ -538,13 +538,13 @@ namespace Raymarcher
                 Max(0, Math.Abs(point.z - c.z) - size.z / 2D) * Max(0, Math.Abs(point.z - c.z) - size.z / 2D);
         }
 
-        [Kernel]
+         
         public static double DistanceToBoxSQRT(Vector3D point, Vector3D centre, Vector3D size)
         {
             return HybMath.Sqrt(DistanceToBox(point, centre, size));
         }
 
-        [Kernel]
+         
         public static double Min(double a, double b)
         {
             if (a < b)
@@ -555,7 +555,7 @@ namespace Raymarcher
             return b;
         }
 
-        [Kernel]
+         
         public static double Max(double a, double b)
         {
             if (a > b)
@@ -566,7 +566,7 @@ namespace Raymarcher
             return b;
         }
 
-        [Kernel]
+         
         public static int GetClosestIndex(Vector3D point, GPUSphere[] spheres, int n)
         {
             if (n == 0) return 0;
@@ -587,14 +587,14 @@ namespace Raymarcher
             return closestIndex;
         }
 
-        [Kernel]
+         
         public static Vector3D GetSphereNormal(Vector3D point, Vector3D spherePos, Vector3D scale)
         {
             //Converts sphere as unit sphere
             return Direction(point - spherePos);
         }
 
-        [Kernel]
+         
         public static Vector3D GetCubeNormal(Vector3D point, Vector3D cubePos, Vector3D size)
         {
             Vector3D relPos = point - cubePos;
@@ -616,14 +616,14 @@ namespace Raymarcher
 
         }
 
-        [Kernel]
+         
         public static Vector3D Direction(Vector3D v)
         {
             double l = Length(v);
             return new Vector3D() { x = v.x / l, y = v.y / l, z = v.z / l };
         }
 
-        [Kernel]
+         
         public static double ClosestDistance(Vector3D pos, GPUSphere[] spheres, int n)
         {
             double minDist = double.MaxValue;
@@ -638,30 +638,30 @@ namespace Raymarcher
             return Math.Sqrt(minDist);
         }
 
-        [Kernel]
+         
         public static double Length(Vector2D v)
         {
             return HybMath.Sqrt(v.x * v.x + v.y * v.y);
         }
 
-        [Kernel]
+         
         public static double Length(Vector3D v)
         {
             return HybMath.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
         }
-        [Kernel]
+         
         public static double Length(float3 v)
         {
             return HybMath.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
         }
 
 
-        [Kernel]
+         
         public static double DistanceToSphere(Vector3D p, Vector3D c, double radius)
         {
             return (c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y) + (c.z - p.z) * (c.z - p.z) - radius * radius;
         }
-        [Kernel]
+         
         public static double DistanceToSphereSQRT(Vector3D p, Vector3D c, double radius)
         {
             return HybMath.Sqrt((c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y) + (c.z - p.z) * (c.z - p.z)) - radius;
@@ -670,7 +670,7 @@ namespace Raymarcher
 
         private static dynamic wrapped;
 
-        [EngineInitializer(321)]
+        //[EngineInitializer(321)]
         public static void Initialize()
         {
             cudaDeviceProp prop;

@@ -265,7 +265,6 @@ public struct Vector2D// : IComparable, IFormattable, IComparable<Vector2D>, IEq
         return this;
     }
 
-    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector2D Abs(Vector2D v)
     {
         return new Vector2D(Math.Abs(v.x), Math.Abs(v.y));

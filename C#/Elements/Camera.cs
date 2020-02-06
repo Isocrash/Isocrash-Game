@@ -27,9 +27,9 @@ namespace Raymarcher
 
         public Bitmap Render()
         {
-            Vector2I resolution = Graphics.GetRenderResolution();
+           // Vector2I resolution = Graphics.GetRenderResolution();
 
-            RenderImage = Imaging.RawToImage(GPUCamera.Render(this), resolution.x, resolution.y);
+            RenderImage = Raymarcher.Rendering.Renderer.Bake(this);
 
             return RenderImage;
         }

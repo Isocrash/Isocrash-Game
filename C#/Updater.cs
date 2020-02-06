@@ -17,13 +17,15 @@ namespace Raymarcher
         {
             Malleable m = new Malleable();
             Camera.Main = m.AddModule<Camera>();
-            Camera.Main.Malleable.Position = new Vector3D(0, 0, -1);
+            Camera.Main.Malleable.Position = new Vector3D(0, 0, 1);
             m.AddModule<Mover>();
             m.AddModule<PlanetSpawner>();
 
             Malleable light = new Malleable() { Name = "Sun" };
             Light.Main = light.AddModule<Light>();
             light.Rotation = EQuaternion.FromEuler(0, 0, 0);
+
+            OnEndUpdate += RefreshInfos;
 
             Thread tf = new Thread(FixedUpdateLoop);
             tf.Priority = ThreadPriority.Highest;
@@ -34,10 +36,19 @@ namespace Raymarcher
             tnf.Priority = ThreadPriority.Highest;
             tnf.IsBackground = true;
             tnf.Start();
+        }
 
-            // Task.Factory.StartNew(() => FixedUpdateLoop()).ConfigureAwait(false);
-            // Task.Factory.StartNew(() => UpdateLoop()).ConfigureAwait(false);
+        private static void RefreshInfos()
+        {
+            Entry.ExecuteOnMainThread(() =>
+            {
+                double updateTime = _Watch.Elapsed.TotalMilliseconds;
 
+                int fps = (int)Math.Round(1D / updateTime * 1000D, 0);
+                double msRenderTime = Math.Round(Rendering.Renderer.RenderTime, 2);
+
+                GameWindow.Instance.lbFPS.Text = fps + " FPS (" + Math.Round(updateTime, 2) + "ms)" + Environment.NewLine + "Render time " + msRenderTime + "ms";
+            });
         }
 
 

@@ -350,7 +350,7 @@ MigrationBackup/
 .ionide/
 
 C\+\+/hybridizer-generated-sources/
-[Ll]ocal [Oo]nly/
-[Ll]ocal[Oo]nly/
-[Ll]ocal-[Oo]nly/
-[Ll]ocal_[Oo]nly/
+#[Ll]ocal [Oo]nly/
+#[Ll]ocal[Oo]nly/
+#[Ll]ocal-[Oo]nly/
+#[Ll]ocal_[Oo]nly/

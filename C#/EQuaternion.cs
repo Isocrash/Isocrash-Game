@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
-using Hybridizer.Runtime.CUDAImports;
+ 
 
 namespace Raymarcher
 {
@@ -12,12 +12,12 @@ namespace Raymarcher
     {
         private const double DegToRad = Math.PI/180D;
 
-        [Kernel]
+         
         public static Quaternion FromEuler(Vector3D angles)
         {
             return FromEuler(angles.x, angles.y, angles.z);
         }
-        [Kernel]
+         
         public static Quaternion FromEuler(double x, double y, double z)
         {
             //To radians
@@ -28,7 +28,7 @@ namespace Raymarcher
             return Quaternion.CreateFromYawPitchRoll((float)y, (float)x, (float)z);
         }
 
-        [Kernel]
+         
         public static Vector3D ToEuler(this Quaternion q)
         {
             Vector3D angles;

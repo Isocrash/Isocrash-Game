@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Raymarcher
 {
-    class Material : Element { }
+    public class Material : Element { }
 }

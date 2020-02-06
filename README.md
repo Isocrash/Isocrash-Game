@@ -1,16 +1,8 @@
 # Raymarcher
-C# Engine based on CUDA. Very WIP
+C# Engine based on OpenCL. Very WIP
 
 # How to build project
 
-- Install the CUDA Toolkit 10.1
-- Install the Altimesh extention
-- Make sure Visual Studio is able to compile C++
-- Switch the project to x64 Release
-- First build the C# then the C++ project. A solution build should be working then.
+- The project should not have any problem to build. If you have any problem, add OpenCL.Net from Nuget and it should be working.
 
-If the project is not compiling, go into the C++ solution and make sure both HybridizerDllFullPath and both RootNamespace/ProjectName are as well then edit GPUCamera.cs' HybRunner dll's name.
-
-The built program should run with no problems. However if a black screen appears try to lower the HybRunner's SetDistrib() blockDimX parameter to 256 or 128.
-
-# The program cannot run on machines that have not the CUDA Toolkit yet for obscure reasons.
+- Copy the __content__ of the CL folder next to the built executable in order to make it compile the CL files. 

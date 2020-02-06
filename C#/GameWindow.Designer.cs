@@ -54,11 +54,13 @@
             this.lbFPS.BackColor = System.Drawing.Color.Transparent;
             this.lbFPS.Cursor = System.Windows.Forms.Cursors.Default;
             this.lbFPS.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbFPS.ForeColor = System.Drawing.Color.Lime;
             this.lbFPS.Location = new System.Drawing.Point(12, 9);
             this.lbFPS.Name = "lbFPS";
-            this.lbFPS.Size = new System.Drawing.Size(151, 37);
+            this.lbFPS.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.lbFPS.Size = new System.Drawing.Size(826, 111);
             this.lbFPS.TabIndex = 1;
-            this.lbFPS.Text = "XXX FPS";
+            this.lbFPS.Text = "ERROR IN GPU CODE !\r\n\r\nFor more infos: Documents\\Raymarcher\\Logs\\Engine.log";
             // 
             // GameWindow
             // 

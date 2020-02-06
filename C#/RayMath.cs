@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Hybridizer.Runtime.CUDAImports;
+ 
 
 namespace Raymarcher
 {
@@ -16,7 +16,7 @@ namespace Raymarcher
         #endregion
 
         #region Clamp
-        [Kernel]
+         
         public static double Clamp(double value, double min, double max)
         {
             if (double.IsNaN(value)) return double.NaN;
@@ -33,7 +33,7 @@ namespace Raymarcher
             if (value > max) return max;
             return value;
         }
-        [Kernel]
+         
         public static int Clamp(int value, int min, int max)
         {
             if (value < min) return min;
@@ -55,7 +55,7 @@ namespace Raymarcher
                 );
         }
 
-        [Kernel]
+         
         public static Colour32 Lerp(Colour32 a, Colour32 b, double t)
         {
             t = Clamp(t, 0.0D, 1.0D);

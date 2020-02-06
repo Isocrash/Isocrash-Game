@@ -50,9 +50,9 @@ namespace Raymarcher
 
 
 
-        private static Vector2I _RenderResolution = new Vector2I(128, 128);
+        private static Vector2I _RenderResolution = new Vector2I(1024, 1024);
         public static double Ratio { get; internal set; } = 1.0D;
-        public static int FrameRateLimit { get; set; } = 0;
+        public static int FrameRateLimit { get; set; } = 60;
 
 
 

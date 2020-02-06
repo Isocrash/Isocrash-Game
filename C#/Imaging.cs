@@ -13,10 +13,10 @@ namespace Raymarcher
 {
     public static class Imaging
     {
-        public static Bitmap RawToImage(byte[] pixels, int width, int height)
+        public static Bitmap RawToImage(byte[] pixels, int width, int height, PixelFormat format)
         {
             Vector2I res = Graphics.GetRenderResolution();
-            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            Bitmap bmp = new Bitmap(width, height, format);
 
             BitmapData bmpData = bmp.LockBits(
                                  new Rectangle(0, 0, bmp.Width, bmp.Height),

@@ -282,7 +282,6 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// <summary>
     /// Get the angle in degree between two vectors.
     /// </summary>
-    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static double Angle(Vector3D v1, Vector3D v2)
     {
         return Math.Acos(Scalar(v1, v2) / (v1.Length * v2.Length)) * 180D / Math.PI;
@@ -322,7 +321,6 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// Transforms the vector to its direction.
     /// </summary>
     /// <returns>Returns itself.</returns>
-    [Hybridizer.Runtime.CUDAImports.Kernel]
     public Vector3D Normalize()
     {
         if (this == Vector3D.Null)
@@ -374,7 +372,6 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// </summary>
     /// <param name="a">First vector</param>
     /// <param name="b">Second vector</param>
-    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D Max(Vector3D a, Vector3D b)
     {
         return a.Length > b.Length ? a : b;
@@ -384,7 +381,6 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// </summary>
     /// <param name="a">First vector</param>
     /// <param name="b">Second vector</param>
-    [Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D Min(Vector3D a, Vector3D b)
     {
         return a.Length < b.Length ? a : b;
@@ -393,18 +389,17 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
     /// Get the absolute value of a vector
     /// </summary>
     /// <param name="v">The vector</param>
-    [Hybridizer.Runtime.CUDAImports.Kernel]
-    public static Vector3D Abs(Vector3D v)
+    /*public static Vector3D Abs(Vector3D v)
     {
         return new Vector3D(Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.x), Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.y), Hybridizer.Runtime.CUDAImports.HybMath.Abs((float)v.z));
-    }
+    }*/
 
     public static Vector3D Round(Vector3D v, int decimals)
     {
         return new Vector3D(Math.Round(v.x, decimals), Math.Round(v.y, decimals), Math.Round(v.z, decimals));
     }
 
-    [Hybridizer.Runtime.CUDAImports.Kernel]
+    //[Hybridizer.Runtime.CUDAImports.Kernel]
     public static Vector3D RotatePointAroundPivot(Vector3D point, Vector3D pivot, Vector3D angles)
     {
         Vector3D dir = point - pivot; // get point direction relative to pivot
@@ -559,12 +554,16 @@ public struct Vector3D// : IComparable, IFormattable, IComparable<Vector3D>, IEq
         double x = rotation.X * 2D;
         double y = rotation.Y * 2D;
         double z = rotation.Z * 2D;
+
         double xx = rotation.X * x;
         double yy = rotation.Y * y;
         double zz = rotation.Z * z;
+
         double xy = rotation.X * y;
         double xz = rotation.X * z;
+
         double yz = rotation.Y * z;
+
         double wx = rotation.W * x;
         double wy = rotation.W * y;
         double wz = rotation.W * z;

@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Raymarcher.Rendering;
+
+namespace Raymarcher
+{
+    public class Body : Module
+    {
+        internal static List<Body> Bodies = new List<Body>();
+
+        public Material Material { get; set; }
+        public Volume Volume { get; set; }
+
+
+        public Body() : base() { }
+        public Body(Volume volume)
+        {
+            this.Volume = volume;
+        }
+        public Body(Volume volume, Material material)
+        {
+            this.Volume = volume;
+            this.Material = material;
+        }
+
+        protected internal override void OnCreation()
+        {
+            Bodies.Add(this);
+
+            base.OnCreation();
+        }
+
+        public override void Destroy()
+        {
+            if(Bodies.Contains(this))
+            {
+                Bodies.Remove(this);
+            }
+            base.Destroy();
+        }
+    }
+}
