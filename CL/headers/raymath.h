@@ -27,13 +27,8 @@ typedef struct
     vector3 direction;
 } ray;
 
-typedef struct
-{
-    byte r;
-    byte g;
-    byte b;
-    byte a;
-} colour32;
+
+
 
 vector3 vdividef(vector3 v, float diviser);
 vector3 vdirection(vector3 v);
@@ -52,5 +47,9 @@ float copysignf(float x, float y);
 double copysignd(double x, double y);
 double dabs(double d);
 float map(float value, float oldLow, float oldHigh, float newLow, float newHigh);
+
+
+float vdistance(vector3 v1, vector3 v2);
+float vdistancesqrt(vector3 v1, vector3 v2);
 
 #endif /* _RAYMARCHER_RAYMATH_H_*/

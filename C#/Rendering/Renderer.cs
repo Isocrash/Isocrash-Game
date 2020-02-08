@@ -99,10 +99,12 @@ namespace Raymarcher.Rendering
         }
         private static Kernel kernel;
         private static IntPtr[] workGroupSizePtr;
-
+        private static Stopwatch bakeSW = new Stopwatch();
         internal static double RenderTime = 0.0D;
         public static Bitmap Bake(Camera camera)
         {
+            
+            bakeSW.Start();
             Vector2I res = Graphics.RenderResolution;
             int totPixels = res.x * res.y;
 
@@ -143,7 +145,12 @@ namespace Raymarcher.Rendering
                 return new Bitmap(1, 1);
             }
 
-            return Imaging.RawToImage(bp, res.x, res.y, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap bm = Imaging.RawToImage(bp, res.x, res.y, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            bakeSW.Stop();
+            Log.Print("Camera image bake took " + Math.Round(bakeSW.Elapsed.TotalMilliseconds, 2) + "ms");
+            bakeSW.Reset();
+            return bm;
         }
 
         private static byte[] PixelToByteArray(PIXEL[] pixels)

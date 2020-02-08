@@ -1,6 +1,5 @@
-
-
 #include <raymath.h>
+#include <colorimetry.h>
 
 typedef struct
 {
@@ -8,9 +7,23 @@ typedef struct
     float fov;
     vector3 position;
     quaternion rotation;
+    vector3 mainDirection;
+    float farClipPlane;
+    float precision;
 } camera;
 
+typedef struct
+{
+    vector3 point;
+    colour128 colour;
+    vector3 normal;
+    bool hasHit;
+    float closest;
+} hitInfos;
+
 ray pixelRay(camera cam, int2 pixel);
+colour128 SkyColour(vector3 dir, vector3 sunDir);
+hitInfos Hit(ray cray, camera cam); 
 
 __kernel void CL_TEST(__global camera* input, __global byte* output)
 {
@@ -27,25 +40,85 @@ __kernel void CL_TEST(__global camera* input, __global byte* output)
     ray r;
     r = pixelRay(cam, pixel);
 
-    vector3 dir = r.direction;
-    dir.x = map(dir.x, -1.0F, 1.0F, 0.0F, 255.0F);
-    dir.y = map(dir.y, -1.0F, 1.0F, 0.0F, 255.0F);
-    dir.z = map(dir.z, -1.0F, 1.0F, 0.0F, 255.0F);
+    colour128 col = SkyColour(r.direction, cam.mainDirection);
 
+    float sunAltitude = 1.0F;
+    bool negative = cam.mainDirection.y < 0.0F;
+    sunAltitude = fabs(cam.mainDirection.y);
 
+    const colour128 SunDayColour = c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
+    const colour128 SunSetColour = c_colour128(1.0F, 0.33F, 0.0F, 1.0F);
 
-    output[i * 4] = (int)(dir.x);//(int)(dir.z); // Blue
-    output[i * 4 + 1] = (int)(dir.y); // Green
-    output[i * 4 + 2] = (int)(dir.z);//(int)(dir.x); // Red
+    if(vdistance(r.direction, cam.mainDirection) < 0.0025F && r.direction.y > 0.0F)
+    {
+        if(negative)
+        {
+            col = SunSetColour;
+        }
+
+        else
+        {
+            col = clerp(SunSetColour, SunDayColour, sqrt(sunAltitude * 2.0F));
+        }
+    }
+
+    //Hit(r, cam);
     
-    output[i * 4 + 3] = 255; // Alpha
+    output[i * 4 + 0] = col.b * 255;    //Blue
+    output[i * 4 + 1] = col.g * 255;    //Green
+    output[i * 4 + 2] = col.r * 255;    //Red
+    output[i * 4 + 3] = col.a * 255;    //Alpha
 };
+
+colour128 SkyColour(vector3 dir, vector3 sunDir)
+{
+    sunDir = vdirection(sunDir);
+
+    const colour128 HorizonColourDay = c_colour128(0.82F, 0.92F, 0.98F, 1.0F);
+    const colour128 HorizonColourSunset = c_colour128(1.0F, 0.48F, 0.0F, 1.0F);
+    const colour128 NightColour = c_colour128(0.0F, 0.0F, 0.0F, 1.0F);
+    const colour128 HighAtmosphereColour = c_colour128(0.23F, 0.41F, 0.70F, 1.0F);
+    const colour128 GroundAtmosphereColour = c_colour128(0.58F, 0.53F, 0.45F, 1.0F);
+
+    colour128 pix = c_colour128(0.0F,0.0F,0.0F,1.0F);
+
+    if(sunDir.x == 0.0F && sunDir.y == 0.0F && sunDir.z == 0.0F)
+    {
+        return pix;
+    }
+
+    float sunAltitude = 1.0F;
+
+    bool negative = sunDir.y < 0.0F;
+    sunAltitude = fabs(sunDir.y);
+
+    colour128 DenseAtmosphereColour = clerp(HorizonColourSunset, HorizonColourDay, sqrt(sunAltitude));
+    colour128 highAtmosphereColour = clerp(NightColour, HighAtmosphereColour, pow(sunAltitude, 0.6F));
+    colour128 groundAtmosphereColour = clerp(NightColour, GroundAtmosphereColour, pow(sunAltitude, 0.6F));
+
+    if(negative)
+    {
+        DenseAtmosphereColour = clerp(HorizonColourSunset, NightColour, sqrt(sunAltitude));
+        highAtmosphereColour = NightColour;
+        groundAtmosphereColour = NightColour;
+    }
+
+    if (dir.y > 0.0F)
+    {
+        pix = clerp(DenseAtmosphereColour, highAtmosphereColour, pow(dir.y, 0.8F));
+    }
+    else
+    {
+        pix = clerp(DenseAtmosphereColour, groundAtmosphereColour, pow(fabs(dir.y), 0.25F));
+    }
+
+    return pix;
+}
 
 
 ray pixelRay(camera cam, int2 pixel)
 {
     // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?http://www.scratchapixel.com/lessons/3d-basic-rendering/3d-viewing-pinhole-camera/how-pinhole-camera-works-part-1
-
     int x = pixel.x;
     int y = pixel.y;
 
@@ -57,10 +130,9 @@ ray pixelRay(camera cam, int2 pixel)
     vector3 rayDirection;
     rayDirection.x = Px;
     rayDirection.y = Py;
-    rayDirection.z = -1.0;
+    rayDirection.z = 1.0;
     
     rayDirection = vdirection(rayDirection);
-
     rayDirection = qmultiplyv(rayDirection, cam.rotation);
     
     ray r;
@@ -70,4 +142,47 @@ ray pixelRay(camera cam, int2 pixel)
     return r;
 }
 
+hitInfos Hit(ray cray, camera cam)
+{
+    vector3 probe = cray.origin;
+    vector3 dir = cray.direction;
+
+    float rayDst = 0.0F;
+    float maxDst = cam.farClipPlane;
+    float precision = cam.precision;
+
+    hitInfos hit;
+    hit.closest = INFINITY;
+
+    while(rayDst < maxDst)
+    {
+        float closestDst = 1.0F;
+
+        if(closestDst < hit.closest)
+        {
+            hit.closest = closestDst;
+        }
+
+        if(closestDst < cam.precision)
+        {
+            hit.point = probe;
+            hit.colour = c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
+            hit.normal = (vector3){ 0.0F, 1.0F, 0.0F };
+            hit.hasHit = true;
+
+            return hit;
+        }
+
+        probe.x = probe.x + dir.x * closestDst;
+        probe.y = probe.y + dir.y * closestDst;
+        probe.z = probe.z + dir.z * closestDst;
+
+        rayDst += closestDst;
+    }
+
+
+    
+
+    return hit;
+}
 

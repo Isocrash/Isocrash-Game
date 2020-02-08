@@ -19,13 +19,12 @@ vector3 qmultiplyv(vector3 v, quaternion q)
     float wy = q.w * y;
     float wz = q.w * z;
 
+    vector3 result;
+    result.x = (1.0F - (yy + zz)) * v.x + (xy - wz) * v.y + (xz + wy) * v.z;
+    result.y = (xy + wz) * v.x + (1.0F - (xx + zz)) * v.y + (yz - wx) * v.z;
+    result.z = (xz - wy) * v.x + (yz + wx) * v.y + (1.0F - (xx + yy)) * v.z;
 
-
-    v.x = (1.0F - (yy + zz)) * v.x + (xy - wz) * v.y + (xz + wy) * v.z;
-    v.y = (xy + wz) * v.x + (1.0F - (xx + zz)) * v.y + (yz - wx) * v.z,
-    v.z = (xz - wy) * v.x + (yz + wx) * v.y + (1.0F - (xx + yy)) * v.z;
-
-    return v;
+    return result;
 }
 
 float3 qmultiplyf3(float3 v, quaternion q)

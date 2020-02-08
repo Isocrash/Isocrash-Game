@@ -25,7 +25,7 @@ namespace Raymarcher
 
         protected internal override void Update()
         {
-            Log.Print(Camera.Main.Malleable.Rotation);
+            //Log.Print(Camera.Main.Malleable.Rotation);
 
             if (Input.CursorMode == CursorLockMode.Locked)
                 MouseRotation += (Vector2D)Input.CursorMovement * MouseSensivity * Time.DeltaTime;

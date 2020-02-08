@@ -37,13 +37,12 @@
             // Render
             // 
             this.Render.BackColor = System.Drawing.Color.Black;
-            this.Render.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Render.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.Render.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Render.Location = new System.Drawing.Point(0, 0);
             this.Render.Margin = new System.Windows.Forms.Padding(0);
             this.Render.Name = "Render";
             this.Render.Size = new System.Drawing.Size(1280, 719);
-            this.Render.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.Render.TabIndex = 0;
             this.Render.TabStop = false;
             this.Render.Click += new System.EventHandler(this.RenderPictureBox_Click);
@@ -73,7 +72,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "GameWindow";
             this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Raymarcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameWindow_Closing);
             this.Load += new System.EventHandler(this.GameWindow_Load);

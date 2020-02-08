@@ -14,6 +14,9 @@ namespace Raymarcher.Rendering
         public float fov;
         public C_VECTOR3 position;
         public C_QUATERNION rotation;
+        public C_VECTOR3 mainDirection;
+        public float farClipPlane;
+        public float precision;
 
         public C_CAMERA(Camera camera)
         {
@@ -23,6 +26,9 @@ namespace Raymarcher.Rendering
 
             position = new C_VECTOR3(camera.Malleable.Position);
             rotation = new C_QUATERNION(camera.Malleable.Rotation);
+            mainDirection = new C_VECTOR3(Light.Main.Malleable.Forward);
+            farClipPlane = -(float)camera.ClipPlanes.y;
+            precision = (float)camera.Precision;
         }
     }
 
