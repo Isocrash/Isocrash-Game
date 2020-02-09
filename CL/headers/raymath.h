@@ -27,7 +27,11 @@ typedef struct
     vector3 direction;
 } ray;
 
-
+enum shape
+{
+    Ball,
+    Box
+};
 
 
 vector3 vdividef(vector3 v, float diviser);

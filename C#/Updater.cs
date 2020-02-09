@@ -47,7 +47,7 @@ namespace Raymarcher
                 int fps = (int)Math.Round(1D / updateTime * 1000D, 0);
                 double msRenderTime = Math.Round(Rendering.Renderer.RenderTime, 2);
 
-                GameWindow.Instance.lbFPS.Text = fps + " FPS (" + Math.Round(updateTime, 2) + "ms)" + Environment.NewLine + "Render time " + msRenderTime + "ms";
+                GameWindow.Instance.lbFPS.Text = /*fps + " FPS (" + Math.Round(updateTime, 2) + "ms)" + Environment.NewLine +*/ "Render time " + msRenderTime + "ms";
             });
         }
 

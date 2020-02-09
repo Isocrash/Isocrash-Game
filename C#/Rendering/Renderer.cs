@@ -63,7 +63,15 @@ namespace Raymarcher.Rendering
                 Application.Exit();
             }
 
-            Program prog = CLoader.LoadProgram(new[] { "opencl/test.cl", "opencl/quaternion.cl", "opencl/utils.cl" }, UsedDevice, gpu_context); 
+            CLoader.LoadProjectPaths(@".\libs", new[] { "c" }, out string[] cfiles, out string[] hfiles);
+
+
+
+            //string[] headers = CLoader.GetCFilesDir(@".\libs", new[] { "h" }).ToArray();
+
+            Program testprog = CLoader.LoadProgram(cfiles, hfiles, UsedDevice, gpu_context);
+
+            Program prog = CLoader.LoadProgram(CLoader.GetCFilesDir(@".\", new[] { "cl" }).ToArray(), new[] { "headers" }, UsedDevice, gpu_context); 
             kernel = Cl.CreateKernel(prog, "CL_TEST", out error);
 
             if(error != ErrorCode.Success)
@@ -127,9 +135,7 @@ namespace Raymarcher.Rendering
             byte[] bp = new byte[totPixels * 4];
             sw.Start();
             error = Cl.EnqueueNDRangeKernel(Queue, kernel, 1, null, workGroupSizePtr, null, 0, null, out event0);
-            sw.Stop();
-            RenderTime = sw.Elapsed.TotalMilliseconds;
-            sw.Reset();
+            
 
             if (error != ErrorCode.Success)
             {
@@ -144,6 +150,9 @@ namespace Raymarcher.Rendering
                 Log.Print("Error while rendering: " + execError.ToString());
                 return new Bitmap(1, 1);
             }
+            sw.Stop();
+            RenderTime = sw.Elapsed.TotalMilliseconds;
+            sw.Reset();
 
             Bitmap bm = Imaging.RawToImage(bp, res.x, res.y, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 

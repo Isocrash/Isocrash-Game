@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "vector3.h": "c",
+        "raymath.h": "c",
+        "color.h": "c"
+    }
+}

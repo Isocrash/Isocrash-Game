@@ -34,6 +34,48 @@ namespace Raymarcher.Rendering
             }
         }
 
+        public static List<string> GetCFilesDir(string folder, string[] extentions)
+        {
+            List<string> paths = new List<string>();
+
+            foreach(string d in Directory.GetDirectories(folder))
+            {
+                foreach(string ext in extentions)
+                {
+                    foreach (string f in Directory.GetFiles(d, "*." + ext))
+                    {
+                        paths.Add(f);
+                    }
+                }
+                
+                paths.AddRange(GetCFilesDir(d, extentions));
+            }
+
+            return paths;
+        }
+
+        public static List<string> GetHFilesDir(string folder)
+        {
+            List<string> paths = new List<string>();
+            foreach (string d in Directory.GetDirectories(folder))
+            {
+                if(Directory.GetFiles(d, "*.h").Length > 0)
+                {
+                    paths.Add(d);
+                }
+
+                paths.AddRange(GetHFilesDir(d));
+            }
+
+            return paths;
+        }
+
+        public static void LoadProjectPaths(string projectFolder, string[] cFilesExtentions, out string[] cFiles, out string[] hFiles)
+        {
+            cFiles = GetCFilesDir(projectFolder, cFilesExtentions).ToArray();
+            hFiles = GetHFilesDir(projectFolder).ToArray();
+        }
+
         /// <summary>
         /// Load a C Script to a readable program.
         /// </summary>
@@ -41,17 +83,21 @@ namespace Raymarcher.Rendering
         /// <param name="device">The device to compile for</param>
         /// <param name="context">The context of the device</param>
         /// <returns></returns>
-        public static Program LoadProgram(string[] filePaths, Device device, Context context)
+        public static Program LoadProgram(string[] filePaths, string[] includeDirectoriesPath, Device device, Context context)
         {
             string[] files = new string[filePaths.Length];
             for (int i = 0; i < filePaths.Length; i++)
             {
                 files[i] = LoadC(filePaths[i]);
             }
-                
 
+            string args = "";
+            for (int i = 0; i < includeDirectoriesPath.Length; i++)
+            {
+                args += "-I " + @includeDirectoriesPath[i] + " ";
+            }
             Program program = Cl.CreateProgramWithSource(context, (uint)files.Length, files, null, out ErrorCode builderror);
-            builderror = Cl.BuildProgram(program, 0, null, "-I headers/", null, IntPtr.Zero);
+            builderror = Cl.BuildProgram(program, 0, null, args, null, IntPtr.Zero);
 
             //string[] paths = path.Split('\\');
             //string filename = paths[paths.Length - 1];

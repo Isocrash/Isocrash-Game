@@ -16,14 +16,17 @@ typedef struct
 {
     vector3 point;
     colour128 colour;
-    vector3 normal;
     bool hasHit;
     float closest;
+    vector3 normal;
 } hitInfos;
 
 ray pixelRay(camera cam, int2 pixel);
 colour128 SkyColour(vector3 dir, vector3 sunDir);
 hitInfos Hit(ray cray, camera cam); 
+float closest(vector3 point);
+vector3 SphereNormal(vector3 p, vector3 sp);
+
 
 __kernel void CL_TEST(__global camera* input, __global byte* output)
 {
@@ -41,28 +44,39 @@ __kernel void CL_TEST(__global camera* input, __global byte* output)
     r = pixelRay(cam, pixel);
 
     colour128 col = SkyColour(r.direction, cam.mainDirection);
+    hitInfos hit = Hit(r, cam);
 
-    float sunAltitude = 1.0F;
-    bool negative = cam.mainDirection.y < 0.0F;
-    sunAltitude = fabs(cam.mainDirection.y);
+    hit.normal = vdirection(hit.normal);
 
-    const colour128 SunDayColour = c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
-    const colour128 SunSetColour = c_colour128(1.0F, 0.33F, 0.0F, 1.0F);
-
-    if(vdistance(r.direction, cam.mainDirection) < 0.0025F && r.direction.y > 0.0F)
+    if(hit.hasHit)
     {
-        if(negative)
-        {
-            col = SunSetColour;
-        }
-
-        else
-        {
-            col = clerp(SunSetColour, SunDayColour, sqrt(sunAltitude * 2.0F));
-        }
+        col.r = map(hit.normal.x, -1.0F, 1.0F, 0.0F, 1.0F);//hit.colour;//c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
+        col.g = map(hit.normal.y, -1.0F, 1.0F, 0.0F, 1.0F);
+        col.b = map(hit.normal.z, -1.0F, 1.0F, 0.0F, 1.0F);
     }
 
-    //Hit(r, cam);
+    else
+    {
+        float sunAltitude = 1.0F;
+        bool negative = cam.mainDirection.y < 0.0F;
+        sunAltitude = fabs(cam.mainDirection.y);
+
+        const colour128 SunDayColour = c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
+        const colour128 SunSetColour = c_colour128(1.0F, 0.33F, 0.0F, 1.0F);
+
+        if(vdistance(r.direction, cam.mainDirection) < 0.0025F && r.direction.y > 0.0F)
+        {
+            if(negative)
+            {
+                col = SunSetColour;
+            }
+
+            else
+            {
+                col = clerp(SunSetColour, SunDayColour, sqrt(sunAltitude * 2.0F));
+            }
+        }
+    }
     
     output[i * 4 + 0] = col.b * 255;    //Blue
     output[i * 4 + 1] = col.g * 255;    //Green
@@ -148,7 +162,7 @@ hitInfos Hit(ray cray, camera cam)
     vector3 dir = cray.direction;
 
     float rayDst = 0.0F;
-    float maxDst = cam.farClipPlane;
+    float maxDst = 10.0F;
     float precision = cam.precision;
 
     hitInfos hit;
@@ -156,33 +170,53 @@ hitInfos Hit(ray cray, camera cam)
 
     while(rayDst < maxDst)
     {
-        float closestDst = 1.0F;
+        float closestDst = closest(probe);
 
         if(closestDst < hit.closest)
         {
             hit.closest = closestDst;
         }
 
-        if(closestDst < cam.precision)
+        if(closestDst < precision)
         {
             hit.point = probe;
             hit.colour = c_colour128(1.0F, 1.0F, 1.0F, 1.0F);
-            hit.normal = (vector3){ 0.0F, 1.0F, 0.0F };
+            hit.normal = SphereNormal(probe, (vector3){ 0.0F, 1.0F, 0.0F });
             hit.hasHit = true;
 
             return hit;
         }
 
-        probe.x = probe.x + dir.x * closestDst;
-        probe.y = probe.y + dir.y * closestDst;
-        probe.z = probe.z + dir.z * closestDst;
+        else
+        {
+            probe.x = probe.x + dir.x * closestDst;
+            probe.y = probe.y + dir.y * closestDst;
+            probe.z = probe.z + dir.z * closestDst;
 
-        rayDst += closestDst;
+            rayDst += closestDst;
+
+            if(rayDst > maxDst)
+            {
+                hit.hasHit = false;
+                return hit;
+            }
+        }
     }
+}
 
+vector3 SphereNormal(vector3 p, vector3 sp)
+{
+    vector3 relPos = (vector3){p.x - sp.x, p.y - sp.y, p.z - sp.z};
+    return vdirection(relPos);
+}
 
-    
+float DistanceToSphereSQRT(vector3 p, vector3 c, float radius)
+{
+    return sqrt((c.x - p.x) * (c.x - p.x) + (c.y - p.y) * (c.y - p.y) + (c.z - p.z) * (c.z - p.z)) - radius;
+}  
 
-    return hit;
+float closest(vector3 point)
+{
+    return DistanceToSphereSQRT(point, (vector3){0.0F,0.0F,0.0F}, 0.5F);
 }
 
