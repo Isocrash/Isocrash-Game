@@ -1,4 +1,5 @@
 #include <vector3.h>
+#include <redef.h>
 
 bool rm_vector3_equals(vector3 v1, vector3 v2)
 {
@@ -22,7 +23,7 @@ vector3 rm_vector3_divide(vector3 v, float d)
 
 float rm_vector3_length(vector3 v)
 {
-    return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
 vector3 rm_vector3_normalize(vector3 v)
@@ -40,7 +41,7 @@ float rm_vector3_squaredDistance(vector3 v1, vector3 v2)
 
 float rm_vector3_distance(vector3 v1, vector3 v2)
 {
-    return sqrtf(rm_vector3_squaredDistance(v1, v2));
+    return sqrt(rm_vector3_squaredDistance(v1, v2));
 }
 
 //__constant vector3 RM_VECTOR3_UNIT = { 1.0F, 1.0F, 1.0F };

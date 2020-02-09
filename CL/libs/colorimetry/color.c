@@ -1,4 +1,5 @@
 #include <color.h>
+#include <raymath.h>
 
 bool rm_color_equals(color c1, color c2)
 {
@@ -27,6 +28,14 @@ color rm_color_createFromKnown(KnownColor c)
     }
 }
 
-
-
+color rm_color_lerp(color c1, color c2, float t)
+{
+    return (color)
+    {
+        rm_math_lerp(c1.r, c2.r, t),
+        rm_math_lerp(c1.g, c2.g, t),
+        rm_math_lerp(c1.b, c2.b, t),
+        rm_math_lerp(c1.a, c2.a, t)
+    };
+}
 

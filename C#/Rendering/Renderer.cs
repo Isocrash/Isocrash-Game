@@ -65,14 +65,10 @@ namespace Raymarcher.Rendering
 
             CLoader.LoadProjectPaths(@".\libs", new[] { "c" }, out string[] cfiles, out string[] hfiles);
 
-
-
-            //string[] headers = CLoader.GetCFilesDir(@".\libs", new[] { "h" }).ToArray();
-
             Program testprog = CLoader.LoadProgram(cfiles, hfiles, UsedDevice, gpu_context);
 
-            Program prog = CLoader.LoadProgram(CLoader.GetCFilesDir(@".\", new[] { "cl" }).ToArray(), new[] { "headers" }, UsedDevice, gpu_context); 
-            kernel = Cl.CreateKernel(prog, "CL_TEST", out error);
+            //Program prog = CLoader.LoadProgram(CLoader.GetCFilesDir(@".\", new[] { "cl" }).ToArray(), new[] { "headers" }, UsedDevice, gpu_context); 
+            kernel = Cl.CreateKernel(testprog, "rm_render_entry", out error);
 
             if(error != ErrorCode.Success)
             {

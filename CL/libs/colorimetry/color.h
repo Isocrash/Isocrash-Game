@@ -1,5 +1,5 @@
-#ifndef _RAYMARCHER_VECTOR3_H_
-#define _RAYMARCHER_VECTOR3_H_
+#ifndef _RAYMARCHER_COLOR_H_
+#define _RAYMARCHER_COLOR_H_
 
 typedef struct colorf
 {
@@ -21,6 +21,7 @@ typedef enum colors
 bool rm_color_equals(color c1, color c2);
 color rm_color_createFromRGBA(float r, float g, float b, float a);
 color rm_color_createFromKnown(KnownColor c);
+color rm_color_lerp(color c1, color c2, float t);
 
 #endif
 
