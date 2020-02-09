@@ -20,3 +20,13 @@ float rm_math_lerp(float a, float b, float t)
     return a + (b - a) * clamp(t, 0.0F, 1.0F);
 }
 
+float rm_math_max(float a, float b)
+{
+    return a < b ? a : b;
+}
+
+float rm_math_min(float a, float b)
+{
+    return a < b ? b : a;
+}
+

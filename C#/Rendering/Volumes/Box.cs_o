@@ -1,5 +1,6 @@
 ﻿ 
-using rm = Raymarcher.Rendering.RMath;
+using rm = Raymarcher.RayMath;
+using System
 
 namespace Raymarcher.Rendering
 {
@@ -9,9 +10,9 @@ namespace Raymarcher.Rendering
         {
             //TODO: take in count the rotation
             return
-                rm.Max(0, HybMath.Abs(point.x - position.x) - scale.x / 2F) * rm.Max(0, HybMath.Abs(point.x - position.x) - scale.x / 2F) +
-                rm.Max(0, HybMath.Abs(point.y - position.y) - scale.y / 2F) * rm.Max(0, HybMath.Abs(point.y - position.y) - scale.y / 2F) +
-                rm.Max(0, HybMath.Abs(point.z - position.z) - scale.z / 2F) * rm.Max(0, HybMath.Abs(point.z - position.z) - scale.z / 2F);
+                rm.Max(0, Math.Abs(point.x - position.x) - scale.x / 2F) * rm.Max(0, Math.Abs(point.x - position.x) - scale.x / 2F) +
+                rm.Max(0, Math.Abs(point.y - position.y) - scale.y / 2F) * rm.Max(0, Math.Abs(point.y - position.y) - scale.y / 2F) +
+                rm.Max(0, Math.Abs(point.z - position.z) - scale.z / 2F) * rm.Max(0, Math.Abs(point.z - position.z) - scale.z / 2F);
         }
 
         public override float3 NormalToSurface(float3 point)

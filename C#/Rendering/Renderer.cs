@@ -64,7 +64,6 @@ namespace Raymarcher.Rendering
             }
 
             CLoader.LoadProjectPaths(@".\libs", new[] { "c" }, out string[] cfiles, out string[] hfiles);
-
             Program testprog = CLoader.LoadProgram(cfiles, hfiles, UsedDevice, gpu_context);
 
             //Program prog = CLoader.LoadProgram(CLoader.GetCFilesDir(@".\", new[] { "cl" }).ToArray(), new[] { "headers" }, UsedDevice, gpu_context); 

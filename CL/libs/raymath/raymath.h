@@ -16,6 +16,8 @@ float rm_math_map(float value, float oldLow, float oldHigh, float newLow, float 
 float rm_math_copysignf(float x, float y);
 double rm_math_dabs(double d);
 float rm_math_lerp(float a, float b, float t);
+float rm_math_max(float a, float b);
+float rm_math_min(float a, float b);
 
 #endif
 

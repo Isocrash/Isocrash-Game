@@ -2,6 +2,7 @@
 #define _RAYMARCHER_PHYSICS_H_
 
 #include <vector3.h>
+#include <redef.h>
 
 typedef struct rayv3
 {

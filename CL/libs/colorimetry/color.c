@@ -11,17 +11,17 @@ color rm_color_createFromRGBA(float r, float g, float b, float a)
     return (color){ r, g, b, a };
 }
 
-color rm_color_createFromKnown(KnownColor c)
+color rm_color_createFromKnown(knownColor c)
 {
     switch (c)
     {
-        case Black:
+        case black:
             return (color){ 0.0F, 0.0F, 0.0F, 1.0F };
-        case Blue:
+        case blue:
             return (color){ 0.0F, 0.0F, 1.0F, 1.0F };
-        case Green:
+        case green:
             return (color){ 0.0F, 1.0F, 0.0F, 1.0F };
-        case Red:
+        case red:
             return (color){ 1.0F, 0.0F, 0.0F, 1.0F };
         default:
             return (color){ 1.0F, 1.0F, 1.0F, 1.0F };

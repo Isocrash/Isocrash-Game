@@ -39,7 +39,7 @@ __kernel void rm_render_entry(__global camera* input, __global byte* output)
     bool negative = cam.mainDirection.y < 0.0F;
     sunAltitude = fabs(cam.mainDirection.y);
 
-    const color SunDayColour = rm_color_createFromKnown(White);
+    const color SunDayColour = rm_color_createFromKnown(white);
     const color SunSetColour = rm_color_createFromRGBA(1.0F, 0.33F, 0.0F, 1.0F);
 
     if(rm_vector3_squaredDistance(r.direction, cam.mainDirection) < 0.0025F && r.direction.y > 0.0F)

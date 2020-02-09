@@ -1,5 +1,4 @@
 #include <vector3.h>
-#include <redef.h>
 
 bool rm_vector3_equals(vector3 v1, vector3 v2)
 {
@@ -20,6 +19,17 @@ vector3 rm_vector3_divide(vector3 v, float d)
 {
     return rm_vector3_create(v.x / d, v.y / d, v.z / d);
 }
+
+vector3 rm_vector3_add(vector3 v1, vector3 v2)
+{
+    return rm_vector3_create(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
+vector3 rm_vector3_substract(vector3 v1, vector3 v2)
+{
+    return rm_vector3_create(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+
 
 float rm_vector3_length(vector3 v)
 {

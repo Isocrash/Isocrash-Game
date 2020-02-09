@@ -2,6 +2,8 @@
     "files.associations": {
         "vector3.h": "c",
         "raymath.h": "c",
-        "color.h": "c"
+        "color.h": "c",
+        "redef.h": "c",
+        "volume.h": "c"
     }
 }
