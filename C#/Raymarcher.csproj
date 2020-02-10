@@ -159,6 +159,7 @@
     <Compile Include="Materials\Skybox.cs" />
     <Compile Include="RayMath.cs" />
     <Compile Include="Rendering\C_CAMERA.cs" />
+    <Compile Include="Rendering\C_VOLUME.cs" />
     <Compile Include="Rendering\GPU_PARAM.cs" />
     <Compile Include="Rendering\Renderer.cs" />
     <None Include="Rendering\Volumes\Ball.cs_o" />

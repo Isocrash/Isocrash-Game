@@ -1,4 +1,5 @@
 #include <vector3.h>
+#include <raymath.h>
 
 bool rm_vector3_equals(vector3 v1, vector3 v2)
 {
@@ -52,6 +53,21 @@ float rm_vector3_squaredDistance(vector3 v1, vector3 v2)
 float rm_vector3_distance(vector3 v1, vector3 v2)
 {
     return sqrt(rm_vector3_squaredDistance(v1, v2));
+}
+
+float rm_vector3_scalar(vector3 u, vector3 v)
+{
+    return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
+float rm_vector3_angle(vector3 v1, vector3 v2)
+{
+    return acos(rm_vector3_scalar(v1, v2) / (rm_vector3_length(v1) * rm_vector3_length(v2)));
+}
+
+float rm_vector3_angleDegree(vector3 v1, vector3 v2)
+{
+    return rm_vector3_angle(v1, v2) * (180.0F / F_PI);
 }
 
 //__constant vector3 RM_VECTOR3_UNIT = { 1.0F, 1.0F, 1.0F };

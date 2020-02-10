@@ -7,8 +7,9 @@
 
 typedef enum volume_type
 {
-    ball,
-    box
+    none = 0,
+    ball = 1,
+    box = 2
 } volumeType;
 
 typedef struct vol
@@ -23,7 +24,8 @@ bool rm_volume_equals(volume v1, volume v2);
 float rm_volume_distance(volume v, vector3 p);
 float rm_volume_squaredDistance(volume v, vector3 p);
 vector3 rm_volume_normal(volume v, vector3 p);
-
+float rm_volume_squaredDistanceToBall(volume v, vector3 p);
+float rm_vector3_scalar(vector3 u, vector3 v);
 
 #endif
 

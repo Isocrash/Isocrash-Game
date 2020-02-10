@@ -21,6 +21,8 @@ float rm_vector3_length(vector3 v);
 vector3 rm_vector3_normalize(vector3 v);
 float rm_vector3_squaredDistance(vector3 v1, vector3 v2);
 float rm_vector3_distance(vector3 v1, vector3 v2);
+float rm_vector3_angle(vector3 v1, vector3 v2);
+float rm_vector3_angleDegree(vector3 v1, vector3 v2);
 
 //extern __constant vector3 RM_VECTOR3_UNIT;
 //extern __constant vector3 RM_VECTOR3_RIGHT;

@@ -59,8 +59,6 @@ namespace Raymarcher
         {
             while (true)
             {
-
-
                 _FixedWatch.Reset();
                 _FixedWatch.Start();
                 FixedUpdateElements();

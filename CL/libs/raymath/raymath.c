@@ -22,11 +22,11 @@ float rm_math_lerp(float a, float b, float t)
 
 float rm_math_max(float a, float b)
 {
-    return a < b ? a : b;
+    return a < b ? b : a;
 }
 
 float rm_math_min(float a, float b)
 {
-    return a < b ? b : a;
+    return a < b ? a : b;
 }
 

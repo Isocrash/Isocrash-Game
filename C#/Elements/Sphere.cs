@@ -9,9 +9,10 @@ namespace Raymarcher
     class Sphere : Primitive
     {
         public Colour32 Colour;
-
+        public static Sphere Main;
         public Sphere() : base()
         {
+            Main = this;
             Colour = new Colour32(EngineInitializer.r.Next(256), EngineInitializer.r.Next(256), EngineInitializer.r.Next(256), 255);
         }
 

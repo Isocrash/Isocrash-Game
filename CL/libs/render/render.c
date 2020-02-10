@@ -3,9 +3,10 @@
 #include <color.h>
 #include <physics.h>
 #include <redef.h>
+#include <volume.h>
+#include <raymath.h>
 
-
-typedef struct
+typedef struct gpu_camera
 {
     int2 resolution;
     float fov;
@@ -14,13 +15,16 @@ typedef struct
     vector3 mainDirection;
     float farClipPlane;
     float precision;
+    volume volume1;
+
 } camera;
 
+bool rm_render_raymarch(volume* volumes, size_t n, ray r, camera cam, hit* h);
 ray rm_render_rayDirection(camera cam, int2 pixel);
 color rm_render_skyColour(vector3 dir, vector3 sunDir);
 
 __kernel void rm_render_entry(__global camera* input, __global byte* output)
-{
+{   
     size_t i = get_global_id(0);
 
     camera cam = *input;
@@ -46,7 +50,7 @@ __kernel void rm_render_entry(__global camera* input, __global byte* output)
     {
         if(negative)
         {
-            col = SunDayColour;
+            col = SunSetColour;
         }
 
         else
@@ -55,10 +59,173 @@ __kernel void rm_render_entry(__global camera* input, __global byte* output)
         }
     }
 
+    cam.volume1.scale = rm_vector3_create(1.0F, 1.0F, 1.0F);
+    cam.volume1.type = ball;
+
+    /*volume v2 = (volume)
+    {
+        rm_vector3_create(0.0F, 2.0F, 0.5F),
+        rm_quaternion_create(0.0F, 0.0F, 0.0F, 1.0F),
+        rm_vector3_create(1.0F, 1.0F, 1.0F),
+        box
+    };
+    volume vols[2] = { cam.volume1, v2 };*/
+
+
+
+    //chunk
+    //size_t cSize = 4;
+    size_t arraySize = 4;
+    volume chunk[4];
+    chunk[0] = 
+        (volume)
+        {
+            (vector3) {0.0F, 0.0F, 0.0F},
+            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
+            (vector3) {1.0F, 1.0F, 1.0F},
+            box
+        };
+       chunk[1] =  (volume)
+        {
+            (vector3) {0.0F, 0.0F, 3.0F},
+            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
+            (vector3) {1.0F, 1.0F, 1.0F},
+            box
+        };
+       chunk[2] =  (volume)
+        {
+            (vector3) {-3.0F, 0.0F, 2.5F},
+            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
+            (vector3) {1.15F, 1.15F, 1.15F},
+            box
+        };
+       chunk[3] =  (volume)
+        {
+            (vector3) {-2.5F, 0.0F, 6.0F},
+            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
+            (vector3) {1.0F, 1.0F, 1.0F},
+            box
+        };
+    
+
+
+    //populate
+    /*for (size_t z = 0; z < cSize; z++)
+    {
+        for (size_t x = 0; x < cSize; x++)
+        {
+            size_t i = x + cSize * z;
+            
+            chunk[(int)i] = (volume)
+            {
+                rm_vector3_create((float)x, (float)z, (float)z + (float)x),
+                rm_quaternion_create(0.0F, 0.0F, 0.0F, 1.0F),
+                rm_vector3_create(1.0F, 1.0F, 1.0F),
+                box
+            };
+        }
+        
+    }*/
+    
+
+
+
+    /*if(cam.volume1.type == ball)
+    {
+        col = rm_color_createFromKnown(white);
+    }
+
+    if(vols[0].type == ball)
+    {
+        col = rm_color_createFromKnown(green);
+    }*/
+
+    hit hi;
+
+    //bool b = rm_render_raymarch(vols, r, cam, &hi);
+
+    /*if(cam.volume1.type == 0)
+    {
+        col = rm_color_createFromKnown(red);
+    }
+    else
+    {
+        col = rm_color_createFromKnown(green);
+    }*/
+    if(rm_render_raymarch(chunk, arraySize, r, cam, &hi))
+    {
+        float angle = rm_vector3_angleDegree(hi.normal, cam.mainDirection);
+        float lightIntensity = cos(angle * -1.0F * DEG_TO_RAD);
+
+        color diffuse = rm_color_multiply(rm_color_createFromKnown(white), lightIntensity);
+        col = diffuse;
+
+        r.origin = rm_vector3_add(hi.location, rm_vector3_multiply(hi.normal, cam.precision));
+        r.direction = rm_vector3_multiply(cam.mainDirection, 1.0F);
+        
+        hi.hit = false;
+
+        // Shadows
+        //if(rm_render_raymarch(chunk, arraySize, r, cam, &hi))
+        //{
+        //    col = rm_color_createFromKnown(black);
+        //}
+    }
+
+    
+
     output[i * 4 + 0] = col.b * 255;    //Blue
     output[i * 4 + 1] = col.g * 255;    //Green
     output[i * 4 + 2] = col.r * 255;    //Red
     output[i * 4 + 3] = col.a * 255;    //Alpha
+}
+
+float rm_render_closestDistance(volume* volumes, size_t n, vector3 p, int * index)
+{
+    float closest = INFINITY;
+
+    for (size_t i = 0; i < n; i++)
+    {
+        float d = rm_volume_squaredDistance(volumes[i], p);
+        if(d < closest)
+        {
+            * index = i;
+            closest = d;
+        }
+    }
+
+    return closest;
+}
+
+bool rm_render_raymarch(volume* volumes, size_t n, ray r, camera cam, hit* h)
+{
+    
+
+    vector3 probe = r.origin;
+    float rayDst = 0.0F;
+    float maxDst = 100.0F;
+
+    bool hasHit = false;
+    
+    
+    float precision = cam.precision;
+
+    while(!hasHit && rayDst < maxDst)
+    {
+        int closestIndex = 1;
+        /*rm_volume_squaredDistance(volumes[0], probe);*/
+        float dst = rm_render_closestDistance(volumes, n, probe, &closestIndex);
+        if(dst < precision)
+        {
+            hasHit = true;
+            *h = rm_hit_create(probe, rm_volume_normal(volumes[(int)closestIndex], probe));
+        }
+
+        probe = rm_vector3_add(probe, rm_vector3_multiply(r.direction, dst));
+        rayDst += dst;
+    }
+
+    return hasHit;
 }
 
 ray rm_render_rayDirection(camera cam, int2 pixel)

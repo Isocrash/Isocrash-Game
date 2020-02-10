@@ -29,6 +29,14 @@ namespace Raymarcher.Rendering
             mainDirection = new C_VECTOR3(Light.Main.Malleable.Forward);
             farClipPlane = -(float)camera.ClipPlanes.y;
             precision = (float)camera.Precision;
+
+            /*volume1 = new C_VOLUME()
+            {
+                position = new C_VECTOR3(),
+                rotation = new C_QUATERNION(),
+                scale = new C_VECTOR3() { x = 1.0F, y = 1.0F, z = 1.0F },
+                type = volumeType.ball //1
+            };*/
         }
     }
 

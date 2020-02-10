@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Numerics;
 using System.Diagnostics;
 using System.Windows.Forms;
-
+using System.Runtime.InteropServices;
 using OpenCL.Net;
 
 namespace Raymarcher.Rendering
@@ -64,10 +64,10 @@ namespace Raymarcher.Rendering
             }
 
             CLoader.LoadProjectPaths(@".\libs", new[] { "c" }, out string[] cfiles, out string[] hfiles);
-            Program testprog = CLoader.LoadProgram(cfiles, hfiles, UsedDevice, gpu_context);
+            Program program = CLoader.LoadProgram(cfiles, hfiles, UsedDevice, gpu_context);
 
             //Program prog = CLoader.LoadProgram(CLoader.GetCFilesDir(@".\", new[] { "cl" }).ToArray(), new[] { "headers" }, UsedDevice, gpu_context); 
-            kernel = Cl.CreateKernel(testprog, "rm_render_entry", out error);
+            kernel = Cl.CreateKernel(program, "rm_render_entry", out error);
 
             if(error != ErrorCode.Success)
             {
@@ -93,9 +93,14 @@ namespace Raymarcher.Rendering
             {
                 Log.Print("Error getting kernel workgroup info: " + error.ToString());
             }
-            Cl.SetKernelArg(kernel, 0, new IntPtr(4), memInput);
-            Cl.SetKernelArg(kernel, 1, new IntPtr(4), memOutput);
-            Cl.SetKernelArg(kernel, 2, new IntPtr(4), pixelAmount * 4);
+
+            int intPtrSize = 0;
+            intPtrSize = Marshal.SizeOf(typeof(IntPtr));
+            
+            Cl.SetKernelArg(kernel, 0, /*new IntPtr(4)*/(IntPtr)intPtrSize, memInput);
+            Cl.SetKernelArg(kernel, 1, /*new IntPtr(4)*/(IntPtr)intPtrSize, memOutput);
+
+            //Cl.SetKernelArg(kernel, 2, new IntPtr(4), pixelAmount * 4);
             workGroupSizePtr = new IntPtr[] { new IntPtr(pixelAmount) };
 
             
@@ -106,7 +111,7 @@ namespace Raymarcher.Rendering
         internal static double RenderTime = 0.0D;
         public static Bitmap Bake(Camera camera)
         {
-            
+
             bakeSW.Start();
             Vector2I res = Graphics.RenderResolution;
             int totPixels = res.x * res.y;
@@ -130,7 +135,7 @@ namespace Raymarcher.Rendering
             byte[] bp = new byte[totPixels * 4];
             sw.Start();
             error = Cl.EnqueueNDRangeKernel(Queue, kernel, 1, null, workGroupSizePtr, null, 0, null, out event0);
-            
+
 
             if (error != ErrorCode.Success)
             {
@@ -138,12 +143,12 @@ namespace Raymarcher.Rendering
             }
 
             Cl.Finish(Queue);
-            
+
             ErrorCode execError = Cl.EnqueueReadBuffer(Queue, (IMem)memOutput, Bool.True, IntPtr.Zero, memory, bp, 0, null, out event0);
             if (execError != ErrorCode.Success)
             {
                 Log.Print("Error while rendering: " + execError.ToString());
-                return new Bitmap(1, 1);
+                //return new Bitmap(1, 1);
             }
             sw.Stop();
             RenderTime = sw.Elapsed.TotalMilliseconds;

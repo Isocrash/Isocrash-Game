@@ -110,7 +110,7 @@ namespace Raymarcher
         {
             Colour256 c0 = a;
             Colour256 c1 = b;
-
+            
             double a01 = (1D - c0.A) * c1.A + c0.A;
 
             return new Colour256(

@@ -4,6 +4,7 @@
         "raymath.h": "c",
         "color.h": "c",
         "redef.h": "c",
-        "volume.h": "c"
+        "volume.h": "c",
+        "physics.h": "c"
     }
 }

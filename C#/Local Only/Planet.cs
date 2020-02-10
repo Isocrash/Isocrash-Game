@@ -12,7 +12,7 @@ namespace Raymarcher
         protected internal override void OnCreation()
         {
 
-            new Sphere() { Name = "Cube", Position = Vector3D.Null, Scale = Vector3D.Positive * 1D };
+            Sphere.Main = new Sphere() { Name = "Cube", Position = Vector3D.Null, Scale = Vector3D.Positive * 1D };
 
             //Body b = this.Malleable.AddModule<Body>();
             //b.Volume = new Rendering.Ball();

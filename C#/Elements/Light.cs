@@ -13,7 +13,7 @@ namespace Raymarcher
         public Colour32 Colour { get; set; } = new Colour32(255, 255, 255, 0);
 
         private Vector3D RotationAxis = new Vector3D(-1, 0, 0).Normalize();
-        private double Angle = 90;
+        private double Angle = 0;
         private double DegPerSec = 5;
 
         static Colour32 SunDayColour = new Colour32(255, 255, 255, 255);
@@ -22,7 +22,7 @@ namespace Raymarcher
 
         protected internal override void FixedUpdate()
         {
-            Angle += DegPerSec * Time.FixedDeltaTime;
+            //Angle += DegPerSec * Time.FixedDeltaTime;
             Quaternion rot = Quaternion.CreateFromAxisAngle((Vector3)RotationAxis, (float)(Angle * 0.0174533D));
             this.Malleable.Rotation = rot;
 

@@ -28,6 +28,17 @@ float rm_volume_distanceToBall(volume v, vector3 p)
         vs.z * vs.z;
 }
 
+float rm_volume_squaredDistanceToBall(volume v, vector3 p)
+{
+    vector3 vp = v.position;
+    vector3 vs = v.scale;
+    
+    return sqrt(
+        (vp.x - p.x) * (vp.x - p.x) +
+        (vp.y - p.y) * (vp.y - p.y) +
+        (vp.z - p.z) * (vp.z - p.z)) - vs.z / 2.0F;
+}
+
 //TODO: take in count the rotation
 float rm_volume_distanceToBox(volume v, vector3 p)
 {
@@ -54,7 +65,13 @@ float rm_volume_distance(volume v, vector3 p)
 
 float rm_volume_squaredDistance(volume v, vector3 p)
 {
-    return sqrt(rm_volume_distance(v, p));
+    switch (v.type)
+    {
+        case box: return sqrt(rm_volume_distanceToBox(v, p));
+        case ball: return rm_volume_squaredDistanceToBall(v, p);
+        
+        default: return INFINITY;
+    }
 }
 
 //TODO: take in count scale
@@ -92,7 +109,7 @@ vector3 rm_volume_normalToBox(volume v, vector3 p)
         n.x = -1.0F;
     }
     
-    else if (rp.z < -vs.z)
+    else if (rp.z > vs.z)
     {
         n.x = 0.0F;
         n.z = 1.0F;
