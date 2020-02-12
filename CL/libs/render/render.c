@@ -19,15 +19,16 @@ typedef struct gpu_camera
 
 } camera;
 
-bool rm_render_raymarch(volume* volumes, size_t n, ray r, camera cam, hit* h);
+bool rm_render_raymarch(__global volume* volumes, size_t n, ray r, camera cam, hit* h);
 ray rm_render_rayDirection(camera cam, int2 pixel);
 color rm_render_skyColour(vector3 dir, vector3 sunDir);
 
-__kernel void rm_render_entry(__global camera* input, __global byte* output)
+__kernel void rm_render_entry(__global camera* input, __global volume* shapes, __global size_t* n, __global byte* output)
 {   
     size_t i = get_global_id(0);
 
     camera cam = *input;
+    size_t objectAmount = *n;
 
     size_t x = i % 1024;
     size_t y = i / 1024;
@@ -59,100 +60,10 @@ __kernel void rm_render_entry(__global camera* input, __global byte* output)
         }
     }
 
-    cam.volume1.scale = rm_vector3_create(1.0F, 1.0F, 1.0F);
-    cam.volume1.type = ball;
-
-    /*volume v2 = (volume)
-    {
-        rm_vector3_create(0.0F, 2.0F, 0.5F),
-        rm_quaternion_create(0.0F, 0.0F, 0.0F, 1.0F),
-        rm_vector3_create(1.0F, 1.0F, 1.0F),
-        box
-    };
-    volume vols[2] = { cam.volume1, v2 };*/
-
-
-
-    //chunk
-    //size_t cSize = 4;
-    size_t arraySize = 4;
-    volume chunk[4];
-    chunk[0] = 
-        (volume)
-        {
-            (vector3) {0.0F, 0.0F, 0.0F},
-            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
-            (vector3) {1.0F, 1.0F, 1.0F},
-            box
-        };
-       chunk[1] =  (volume)
-        {
-            (vector3) {0.0F, 0.0F, 3.0F},
-            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
-            (vector3) {1.0F, 1.0F, 1.0F},
-            box
-        };
-       chunk[2] =  (volume)
-        {
-            (vector3) {-3.0F, 0.0F, 2.5F},
-            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
-            (vector3) {1.15F, 1.15F, 1.15F},
-            box
-        };
-       chunk[3] =  (volume)
-        {
-            (vector3) {-2.5F, 0.0F, 6.0F},
-            (quaternion) {0.0F, 0.0F, 0.0F, 1.0F},
-            (vector3) {1.0F, 1.0F, 1.0F},
-            box
-        };
-    
-
-
-    //populate
-    /*for (size_t z = 0; z < cSize; z++)
-    {
-        for (size_t x = 0; x < cSize; x++)
-        {
-            size_t i = x + cSize * z;
-            
-            chunk[(int)i] = (volume)
-            {
-                rm_vector3_create((float)x, (float)z, (float)z + (float)x),
-                rm_quaternion_create(0.0F, 0.0F, 0.0F, 1.0F),
-                rm_vector3_create(1.0F, 1.0F, 1.0F),
-                box
-            };
-        }
-        
-    }*/
-    
-
-
-
-    /*if(cam.volume1.type == ball)
-    {
-        col = rm_color_createFromKnown(white);
-    }
-
-    if(vols[0].type == ball)
-    {
-        col = rm_color_createFromKnown(green);
-    }*/
+    //size_t arraySize = 1;
 
     hit hi;
-
-    //bool b = rm_render_raymarch(vols, r, cam, &hi);
-
-    /*if(cam.volume1.type == 0)
-    {
-        col = rm_color_createFromKnown(red);
-    }
-    else
-    {
-        col = rm_color_createFromKnown(green);
-    }*/
-    if(rm_render_raymarch(chunk, arraySize, r, cam, &hi))
+    if(rm_render_raymarch(shapes, objectAmount, r, cam, &hi))
     {
         float angle = rm_vector3_angleDegree(hi.normal, cam.mainDirection);
         float lightIntensity = cos(angle * -1.0F * DEG_TO_RAD);
@@ -180,7 +91,7 @@ __kernel void rm_render_entry(__global camera* input, __global byte* output)
     output[i * 4 + 3] = col.a * 255;    //Alpha
 }
 
-float rm_render_closestDistance(volume* volumes, size_t n, vector3 p, int * index)
+float rm_render_closestDistance(__global volume* volumes, size_t n, vector3 p, int * index)
 {
     float closest = INFINITY;
 
@@ -197,7 +108,7 @@ float rm_render_closestDistance(volume* volumes, size_t n, vector3 p, int * inde
     return closest;
 }
 
-bool rm_render_raymarch(volume* volumes, size_t n, ray r, camera cam, hit* h)
+bool rm_render_raymarch(__global volume* volumes, size_t n, ray r, camera cam, hit* h)
 {
     
 

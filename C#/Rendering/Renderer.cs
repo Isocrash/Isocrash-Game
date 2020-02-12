@@ -18,8 +18,9 @@ namespace Raymarcher.Rendering
 
         private static CommandQueue Queue { get; set; }
 
-        private static Mem memInput;
+        private static Mem memInput { get; set; }
         private static Mem memOutput;
+        private static Mem memVolume { get; set; }
 
         private static IntPtr memory;
 
@@ -29,7 +30,7 @@ namespace Raymarcher.Rendering
 
         private static int inputSize = 0;
         private static int outputSize = 0;
-
+        private static int volumeSize = 0;
         [EngineInitializer(322)]
         public static void Initialize()
         {
@@ -44,14 +45,17 @@ namespace Raymarcher.Rendering
             Vector2I res = Graphics.RenderResolution;
             int pixelAmount = res.x * res.y;
 
+            int amountOfObjects = 1;
+
             unsafe
             {
                 inputSize = sizeof(C_CAMERA);
-                outputSize = sizeof(byte) * pixelAmount * 4;
+                outputSize = sizeof(byte) * res.x * res.y * 4;
+
             }
 
             UsedDevice = Cl.GetDeviceIDs(platforms[0], DeviceType.All, out error)[0];
-            Context gpu_context = Cl.CreateContext(null, 1, new Device[] { UsedDevice }, null, IntPtr.Zero, out error);
+            gpu_context = Cl.CreateContext(null, 1, new Device[] { UsedDevice }, null, IntPtr.Zero, out error);
             InfoBuffer namebuffer = Cl.GetDeviceInfo(UsedDevice, DeviceInfo.Name, out error);
             Log.Print("OpenCL Running on " + namebuffer);
 
@@ -78,6 +82,8 @@ namespace Raymarcher.Rendering
             memInput = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, inputSize, out error);
             memOutput = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.WriteOnly, outputSize, out error);
 
+            
+
             //GPU_PARAM param = new GPU_PARAM() { X_RESOLUTION = res.x, Y_RESOLUTION = res.y };
 
             ////Vector3D pos = camera.Malleable.Position;
@@ -94,17 +100,20 @@ namespace Raymarcher.Rendering
                 Log.Print("Error getting kernel workgroup info: " + error.ToString());
             }
 
-            int intPtrSize = 0;
+            //int intPtrSize = 0;
             intPtrSize = Marshal.SizeOf(typeof(IntPtr));
             
-            Cl.SetKernelArg(kernel, 0, /*new IntPtr(4)*/(IntPtr)intPtrSize, memInput);
-            Cl.SetKernelArg(kernel, 1, /*new IntPtr(4)*/(IntPtr)intPtrSize, memOutput);
+            Cl.SetKernelArg(kernel, 0, (IntPtr)intPtrSize, memInput);
+            //Cl.SetKernelArg(kernel, 1, (IntPtr)intPtrSize, memVolume);
+            Cl.SetKernelArg(kernel, 3, (IntPtr)intPtrSize, memOutput);
 
             //Cl.SetKernelArg(kernel, 2, new IntPtr(4), pixelAmount * 4);
             workGroupSizePtr = new IntPtr[] { new IntPtr(pixelAmount) };
 
             
         }
+        private static Context gpu_context;
+        private static int intPtrSize = 0;
         private static Kernel kernel;
         private static IntPtr[] workGroupSizePtr;
         private static Stopwatch bakeSW = new Stopwatch();
@@ -115,18 +124,32 @@ namespace Raymarcher.Rendering
             bakeSW.Start();
             Vector2I res = Graphics.RenderResolution;
             int totPixels = res.x * res.y;
-
-            //Vector3D pos = camera.Malleable.Position;
-            //Quaternion q = camera.Malleable.Rotation;
-
             C_CAMERA cam = new C_CAMERA(camera);
-            /*{
-                resolution = new int2(res.x, res.y),
-                position = new float3((float)pos.x, (float)pos.y, (float)pos.z),
-                rotation = new float4((float)q.W, (float)q.X, (float)q.Y, (float)q.Z)
-            };*/
 
-            ErrorCode error = Cl.EnqueueWriteBuffer(Queue, (IMem)memInput, Bool.True, IntPtr.Zero, new IntPtr(inputSize), cam, 0, null, out Event event0);
+            C_VOLUME[] vols = new C_VOLUME[] { new C_VOLUME(Sphere.Main), new C_VOLUME() { position = new C_VECTOR3(new Vector3D(2, 5, 1)), scale = new C_VECTOR3(new Vector3D(1, 1, 1)), type = volumeType.box } };
+
+            unsafe
+            {
+                volumeSize = sizeof(C_VOLUME) * vols.Length;
+                
+            }
+
+            ErrorCode error;
+
+            // Création de la mémoire pour les objets
+            memVolume = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, volumeSize, out error);
+            // Met cette mémoire en argument
+            Cl.SetKernelArg(kernel, 1, (IntPtr)intPtrSize, memVolume);
+
+            int nVolumeSize = vols.Length * sizeof(int);
+            Mem memNVolume = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, nVolumeSize, out error);
+
+            Cl.SetKernelArg(kernel, 2, (IntPtr)intPtrSize, memNVolume);
+
+            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memInput, Bool.True, IntPtr.Zero, new IntPtr(inputSize), cam, 0, null, out Event event0);
+            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memVolume, Bool.True, IntPtr.Zero, new IntPtr(volumeSize), vols, 0, null, out event0);
+            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memNVolume, Bool.True, IntPtr.Zero, new IntPtr(nVolumeSize), vols.Length, 0, null, out event0);
+
             if (error != ErrorCode.Success)
             {
                 Log.Print("Error when enqueuing buffer: " + error.ToString());

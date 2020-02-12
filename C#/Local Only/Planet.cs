@@ -29,12 +29,13 @@ namespace Raymarcher
 
             //Planet pla = p.AddModule<Planet>();
 
-            //Physics phy = pla.Malleable.AddModule<Physics>();//p.Module<Physics>();
+            Physics phy = Sphere.Main.AddModule<Physics>();//p.Module<Physics>();
 
             //pla.Physic = phy;
-            //phy.AttractedByGlobalGravity = false;
-            //phy.Mass = Malleable.Scale.z * Malleable.Scale.z * Malleable.Scale.z * 1E+10;
-            //phy.Freeze = true;
+            phy.AttractedByGlobalGravity = false;
+            phy.Velocity = new Vector3D(0.0D, 0.0D, 1.0D);
+            phy.Mass = Malleable.Scale.z * Malleable.Scale.z * Malleable.Scale.z * 1E+10;
+            phy.Freeze = false;
 
             /*new Sphere() { Position = Vector3D.Forward };
 

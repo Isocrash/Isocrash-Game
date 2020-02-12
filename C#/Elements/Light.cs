@@ -13,7 +13,7 @@ namespace Raymarcher
         public Colour32 Colour { get; set; } = new Colour32(255, 255, 255, 0);
 
         private Vector3D RotationAxis = new Vector3D(-1, 0, 0).Normalize();
-        private double Angle = 0;
+        private double Angle = 45;
         private double DegPerSec = 5;
 
         static Colour32 SunDayColour = new Colour32(255, 255, 255, 255);
