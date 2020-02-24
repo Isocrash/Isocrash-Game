@@ -12,7 +12,7 @@ namespace Raymarcher
         protected internal override void OnCreation()
         {
 
-            Sphere.Main = new Sphere() { Name = "Cube", Position = Vector3D.Null, Scale = Vector3D.Positive * 1D };
+            //Sphere.Main = new Sphere() { Name = "Cube", Position = Vector3D.Null, Scale = Vector3D.Positive * 1D };
 
             //Body b = this.Malleable.AddModule<Body>();
             //b.Volume = new Rendering.Ball();
@@ -29,13 +29,13 @@ namespace Raymarcher
 
             //Planet pla = p.AddModule<Planet>();
 
-            Physics phy = Sphere.Main.AddModule<Physics>();//p.Module<Physics>();
+            //Physics phy = Sphere.Main.AddModule<Physics>();//p.Module<Physics>();
 
             //pla.Physic = phy;
-            phy.AttractedByGlobalGravity = false;
-            phy.Velocity = new Vector3D(0.0D, 0.0D, 1.0D);
-            phy.Mass = Malleable.Scale.z * Malleable.Scale.z * Malleable.Scale.z * 1E+10;
-            phy.Freeze = false;
+            //phy.AttractedByGlobalGravity = false;
+            //phy.Velocity = new Vector3D(0.0D, 0.0D, 1.0D);
+            //phy.Mass = Malleable.Scale.z * Malleable.Scale.z * Malleable.Scale.z * 1E+10;
+            //phy.Freeze = true;
 
             /*new Sphere() { Position = Vector3D.Forward };
 

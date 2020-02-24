@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Raymarcher
 {
-    public class Mover : Module
+    public class FreeCamController : Module
     {
         public double Speed = 5D;
 

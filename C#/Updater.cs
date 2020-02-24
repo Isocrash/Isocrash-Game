@@ -15,16 +15,6 @@ namespace Raymarcher
         [EngineInitializer(int.MaxValue - 10)]
         public static void InitializeThread()
         {
-            Malleable m = new Malleable();
-            Camera.Main = m.AddModule<Camera>();
-            Camera.Main.Malleable.Position = new Vector3D(0, 0, 1);
-            m.AddModule<Mover>();
-            m.AddModule<PlanetSpawner>();
-
-            Malleable light = new Malleable() { Name = "Sun" };
-            Light.Main = light.AddModule<Light>();
-            light.Rotation = EQuaternion.FromEuler(0, 0, 0);
-
             OnEndUpdate += RefreshInfos;
 
             Thread tf = new Thread(FixedUpdateLoop);

@@ -1,5 +1,6 @@
 #include <volume.h>
 #include <raymath.h>
+//#include <quaternion.h>
 
 bool rm_volume_equals(volume v1, volume v2)
 {
@@ -43,7 +44,13 @@ float rm_volume_squaredDistanceToBall(volume v, vector3 p)
 float rm_volume_distanceToBox(volume v, vector3 p)
 {
     vector3 vp = v.position;
+
+    
     vector3 vs = rm_vector3_divide(v.scale, 2.0F);
+
+    quaternion rot = v.rotation;
+
+    p = rm_vector3_rotateAroundPivot(p, vp, rot);
 
     float x = rm_math_max(0.0F, fabs(p.x - vp.x) - vs.x);
     float y = rm_math_max(0.0F, fabs(p.y - vp.y) - vs.y);
@@ -83,10 +90,15 @@ vector3 rm_volume_normalToBall(volume v, vector3 p)
 //TODO: take in count the rotation
 vector3 rm_volume_normalToBox(volume v, vector3 p)
 {
+    vector3 zero;
+    //p = rm_vector3_rotateAroundPivot(p, v.position, v.rotation);
+    
     vector3 rp = rm_vector3_substract(p, v.position);
+
     vector3 n = rm_vector3_create(1.0F, 0.0F, 0.0F);
     vector3 vs = rm_vector3_divide(v.scale, 2.0F);
 
+    
     if (rp.y > vs.y)
     {
         n.x = 0.0F;
@@ -121,7 +133,7 @@ vector3 rm_volume_normalToBox(volume v, vector3 p)
         n.z = -1.0F;
     }
 
-    return n;
+    return rm_vector3_normalize(n);
 }
 
 vector3 rm_volume_normal(volume v, vector3 p)

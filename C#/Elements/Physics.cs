@@ -12,9 +12,25 @@ namespace Raymarcher
 
         public double Mass { get; set; } = 1D;
 
-        public bool AttractedByGlobalGravity = false;
+        public bool AttractedByGlobalGravity = true;
 
         public Vector3D Velocity { get; set; } = Vector3D.Null;
+
+        public double Speed
+        {
+            get
+            {
+                return Velocity.Length;
+            }
+        }
+
+        public double Momentum
+        {
+            get
+            {
+                return Speed * Mass;
+            }
+        }
 
         public bool Freeze = false;
 

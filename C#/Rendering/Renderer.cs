@@ -118,6 +118,11 @@ namespace Raymarcher.Rendering
         private static IntPtr[] workGroupSizePtr;
         private static Stopwatch bakeSW = new Stopwatch();
         internal static double RenderTime = 0.0D;
+
+        static Quaternion rot = EQuaternion.FromEuler(0D, 0D, 0D);
+        static Vector3D axis = Vector3D.Up;
+        static double rotationSpeed = 20.0D;
+        static double angle = 0D;
         public static Bitmap Bake(Camera camera)
         {
 
@@ -126,7 +131,20 @@ namespace Raymarcher.Rendering
             int totPixels = res.x * res.y;
             C_CAMERA cam = new C_CAMERA(camera);
 
-            C_VOLUME[] vols = new C_VOLUME[] { new C_VOLUME(Sphere.Main), new C_VOLUME() { position = new C_VECTOR3(new Vector3D(2, 5, 1)), scale = new C_VECTOR3(new Vector3D(1, 1, 1)), type = volumeType.box } };
+            angle += rotationSpeed * Time.DeltaTime;
+            rot = Quaternion.CreateFromAxisAngle((Vector3)axis, (float)(angle * 0.0174533D));
+
+
+            C_VOLUME[] vols = new C_VOLUME[]
+            { /*new C_VOLUME(Sphere.Main),*/ 
+                new C_VOLUME()
+                {
+                    rotation = new C_QUATERNION(rot),
+                    position = new C_VECTOR3(new Vector3D(-2, 0, 0)), 
+                    scale = new C_VECTOR3(new Vector3D(1, 1, 1)), 
+                    type = volumeType.box 
+                }
+            };
 
             unsafe
             {
