@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
- 
+using OpenCL.Net;
 
 namespace Raymarcher
 {
@@ -77,6 +77,18 @@ namespace Raymarcher
             return newLow + (value - oldLow) * (newHigh - newLow) / (oldHigh - oldLow);
         }
         #endregion
+
+
+        /// <summary>
+        /// Get 1D index of a 3D index
+        /// </summary>
+        /// <param name="size">The size of the 3D array</param>
+        /// <param name="coordinates">The coordinates of the wanted index</param>
+        /// <returns>The 1D index of the 3D coordinates</returns>
+        public static int FlatTo3D(int3 size, int3 coordinates)
+        {
+            return coordinates.x + size.x*coordinates.y + size.x*size.y*coordinates.z;//+ coordinates.x * (coordinates.y + size.z * coordinates.z);
+        }
     }
 }
 

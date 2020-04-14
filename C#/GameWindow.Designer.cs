@@ -73,7 +73,7 @@
             this.Name = "GameWindow";
             this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Raymarcher";
+            this.Text = "Isocrash";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameWindow_Closing);
             this.Load += new System.EventHandler(this.GameWindow_Load);
             this.LostFocus += new System.EventHandler(this.GameWindow_LostFocus);

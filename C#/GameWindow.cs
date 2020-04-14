@@ -46,7 +46,8 @@ namespace Raymarcher
 
         private void GameWindow_Closing(object sender, CancelEventArgs e)
         {
-            
+            Isocrash.Net.Client.Disconnect();
+            Isocrash.Net.Server.Shutdown();
             //e.Cancel = true;  
         }
 

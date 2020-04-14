@@ -20,6 +20,7 @@ namespace Raymarcher.Rendering
 
         private static Mem memInput { get; set; }
         private static Mem memOutput;
+        private static Mem memTime;
         private static Mem memVolume { get; set; }
 
         private static IntPtr memory;
@@ -30,7 +31,8 @@ namespace Raymarcher.Rendering
 
         private static int inputSize = 0;
         private static int outputSize = 0;
-        private static int volumeSize = 0;
+        private static int modelSize = 0;
+        private static int timeSize = sizeof(float);
         [EngineInitializer(322)]
         public static void Initialize()
         {
@@ -51,7 +53,6 @@ namespace Raymarcher.Rendering
             {
                 inputSize = sizeof(C_CAMERA);
                 outputSize = sizeof(byte) * res.x * res.y * 4;
-
             }
 
             UsedDevice = Cl.GetDeviceIDs(platforms[0], DeviceType.All, out error)[0];
@@ -80,6 +81,7 @@ namespace Raymarcher.Rendering
 
             memory = new IntPtr(outputSize);
             memInput = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, inputSize, out error);
+            memTime = (Mem)(Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, timeSize, out error));
             memOutput = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.WriteOnly, outputSize, out error);
 
             
@@ -104,8 +106,9 @@ namespace Raymarcher.Rendering
             intPtrSize = Marshal.SizeOf(typeof(IntPtr));
             
             Cl.SetKernelArg(kernel, 0, (IntPtr)intPtrSize, memInput);
-            //Cl.SetKernelArg(kernel, 1, (IntPtr)intPtrSize, memVolume);
-            Cl.SetKernelArg(kernel, 3, (IntPtr)intPtrSize, memOutput);
+            Cl.SetKernelArg(kernel, 1, (IntPtr)intPtrSize, memTime);
+            
+            Cl.SetKernelArg(kernel, 4, (IntPtr)intPtrSize, memOutput);
 
             //Cl.SetKernelArg(kernel, 2, new IntPtr(4), pixelAmount * 4);
             workGroupSizePtr = new IntPtr[] { new IntPtr(pixelAmount) };
@@ -123,9 +126,10 @@ namespace Raymarcher.Rendering
         static Vector3D axis = Vector3D.Up;
         static double rotationSpeed = 20.0D;
         static double angle = 0D;
+
+        internal static List<C_VOLUME> volumes = new List<C_VOLUME>();
         public static Bitmap Bake(Camera camera)
         {
-
             bakeSW.Start();
             Vector2I res = Graphics.RenderResolution;
             int totPixels = res.x * res.y;
@@ -134,44 +138,50 @@ namespace Raymarcher.Rendering
             angle += rotationSpeed * Time.DeltaTime;
             rot = Quaternion.CreateFromAxisAngle((Vector3)axis, (float)(angle * 0.0174533D));
 
+            float time = (float)Time.TimeSinceStart;
 
-            C_VOLUME[] vols = new C_VOLUME[]
-            { /*new C_VOLUME(Sphere.Main),*/ 
-                new C_VOLUME()
-                {
-                    rotation = new C_QUATERNION(rot),
-                    position = new C_VECTOR3(new Vector3D(-2, 0, 0)), 
-                    scale = new C_VECTOR3(new Vector3D(1, 1, 1)), 
-                    type = volumeType.box 
-                }
-            };
+            Bitmap image = new Bitmap("diamond_sword.png");
+            
+            Voxel sword = Voxel.CreateFromImage(image);
+            Voxel.ConvertToImage(sword).Save("C:/Users/Arthur/Desktop/debug.png");
+            C_VOXEL model = new C_VOXEL(sword);
 
+
+            int modelSizeSize;
+            int modelColorsSize;
             unsafe
             {
-                volumeSize = sizeof(C_VOLUME) * vols.Length;
-                
+                modelSizeSize = sizeof(int3);
+                modelColorsSize = sizeof(Colour32) * model.colors.Length;
+                //modelSize = sizeof(Colour32) * model.colors.Length + sizeof(int3) + sizeof(C_BOX);
+                //modelSize = sizeof(model);
+                //volumeSize = sizeof(C_VOLUME) * vols.Length;
+                //Log.Print("Objects size: " + volumes.Count + $" (Taking {volumeSize} bytes of memory)");
             }
 
-            ErrorCode error;
+            ErrorCode error = ErrorCode.Success;
 
-            // Création de la mémoire pour les objets
-            memVolume = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, volumeSize, out error);
-            // Met cette mémoire en argument
-            Cl.SetKernelArg(kernel, 1, (IntPtr)intPtrSize, memVolume);
+            Mem memModelSize = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, modelSizeSize, out error);
+            Mem memModelColors = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, modelColorsSize, out error);
 
-            int nVolumeSize = vols.Length * sizeof(int);
-            Mem memNVolume = (Mem)Cl.CreateBuffer(gpu_context, MemFlags.ReadOnly, nVolumeSize, out error);
+            Cl.SetKernelArg(kernel, 2, (IntPtr)intPtrSize, memModelSize);
+            Cl.SetKernelArg(kernel, 3, (IntPtr)intPtrSize, memModelColors);
 
-            Cl.SetKernelArg(kernel, 2, (IntPtr)intPtrSize, memNVolume);
-
-            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memInput, Bool.True, IntPtr.Zero, new IntPtr(inputSize), cam, 0, null, out Event event0);
-            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memVolume, Bool.True, IntPtr.Zero, new IntPtr(volumeSize), vols, 0, null, out event0);
-            error = Cl.EnqueueWriteBuffer(Queue, (IMem)memNVolume, Bool.True, IntPtr.Zero, new IntPtr(nVolumeSize), vols.Length, 0, null, out event0);
-
-            if (error != ErrorCode.Success)
+            Event event0;
+            try
             {
-                Log.Print("Error when enqueuing buffer: " + error.ToString());
+                error = Cl.EnqueueWriteBuffer(Queue, (IMem)memInput, Bool.True, IntPtr.Zero, new IntPtr(inputSize), cam, 0, null, out event0);
+                error = Cl.EnqueueWriteBuffer(Queue, (IMem)memModelSize, Bool.True, IntPtr.Zero, new IntPtr(modelSizeSize), model.size, 0, null, out event0);
+                error = Cl.EnqueueWriteBuffer(Queue, (IMem)memModelColors, Bool.True, IntPtr.Zero, new IntPtr(modelColorsSize), model.colors, 0, null, out event0);
+
+                error = Cl.EnqueueWriteBuffer(Queue, (IMem)memTime, Bool.True, IntPtr.Zero, new IntPtr(sizeof(float)), time, 0, null, out event0);
+                //error = Cl.EnqueueWriteBuffer(Queue, (IMem)memNVolume, Bool.True, IntPtr.Zero, new IntPtr(nVolumeSize), vols.Length, 0, null, out event0);
             }
+            catch (Exception e)
+            {
+                Log.Print("Error when enqueuing buffer:\n\t-OpenCL Error:" + error.ToString() + "\n\t-DotNet Error: " + e);
+            }
+            
 
             byte[] bp = new byte[totPixels * 4];
             sw.Start();
@@ -191,59 +201,43 @@ namespace Raymarcher.Rendering
                 Log.Print("Error while rendering: " + execError.ToString());
                 //return new Bitmap(1, 1);
             }
-            sw.Stop();
+            //sw.Stop();
             RenderTime = sw.Elapsed.TotalMilliseconds;
-            sw.Reset();
+            //sw.Reset();
 
             Bitmap bm = Imaging.RawToImage(bp, res.x, res.y, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            bakeSW.Stop();
-            Log.Print("Camera image bake took " + Math.Round(bakeSW.Elapsed.TotalMilliseconds, 2) + "ms");
-            bakeSW.Reset();
+            //bakeSW.Stop();
+            //Log.Print("Camera image bake took " + Math.Round(bakeSW.Elapsed.TotalMilliseconds, 2) + "ms");
+            //bakeSW.Reset();
             return bm;
         }
+    }
 
-        private static byte[] PixelToByteArray(PIXEL[] pixels)
+    internal struct C_BOX
+    {
+        public float3 center;
+        public C_QUATERNION rotation;
+        public float3 extents;
+    }
+
+    internal struct C_VOXEL
+    {
+        public int3 size;
+        public Colour32[] colors;
+        public C_BOX box;
+
+        public C_VOXEL(Voxel voxel)
         {
-            Stopwatch swa = new Stopwatch();
-            swa.Start();
-            byte[] bPixels = new byte[pixels.Length * 4];
-            Parallel.For(0, pixels.Length, i =>
-            {
-                PIXEL pix = pixels[i];
+            this.size = voxel.Size;
+            this.colors = voxel.Colours;
 
-                //bytes are BGRA format, pixels RGBA
-                bPixels[i * 4] = pix.B; //Blue
-                bPixels[i * 4 + 1] = pix.G; //Green
-                bPixels[i * 4 + 2] = pix.R; //Red
-                bPixels[i * 4 + 3] = pix.A; //Alpha
-            });
-            swa.Stop();
-            Log.Print("Converted " + pixels.Length + " pixels to " + bPixels.Length + " bytes in " + Math.Round(swa.Elapsed.TotalMilliseconds, 2) + " ms");
-            return bPixels;
+            this.box = new C_BOX()
+            {
+                center = new float3(0.0F, 0.0F, 0.0F),
+                extents = new float3(this.size.x / 2.0F, this.size.y / 2.0F, this.size.z / 2.0F),
+                rotation = new C_QUATERNION(new Quaternion(0.0F, 0.0F, 0.0F, 1.0F))
+            };
         }
-
-       /* private static GraphicalObject[] BuildObjects()
-        {
-            if (Body.Bodies == null)
-            {
-                Log.Print("null");
-                return new GraphicalObject[1];
-            }
-            Log.Print("not null");
-            Body[] bodies = Body.Bodies.ToArray();
-            GraphicalObject[] gos = new GraphicalObject[bodies.Length];
-
-            for (int i = 0; i < bodies.Length; i++)
-            {
-                GraphicalObject go = new GraphicalObject
-                {
-                    volume = bodies[i].Volume,
-                    material = null
-                };
-            }
-
-            return gos;
-        }*/
     }
 }

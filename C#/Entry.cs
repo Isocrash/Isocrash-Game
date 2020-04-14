@@ -30,7 +30,7 @@ namespace Raymarcher
         }
 
 
-        [EngineInitializer(int.MaxValue)]
+        [EngineInitializer(int.MaxValue - 10)]
         public static void InitializeWindowsForms()
         {
             Application.EnableVisualStyles();

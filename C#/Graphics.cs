@@ -52,7 +52,7 @@ namespace Raymarcher
 
         private static Vector2I _RenderResolution = new Vector2I(1024, 1024);
         public static double Ratio { get; internal set; } = 1.0D;
-        public static int FrameRateLimit { get; set; } = 60;
+        public static int FrameRateLimit { get; set; } = 0;
 
 
 
@@ -63,7 +63,7 @@ namespace Raymarcher
         private static FormWindowState PreFullScreenState;
 
 
-        public static LockMode ResolutionLockMode { get; set; } = LockMode.None;
+        public static LockMode ResolutionLockMode { get; set; } = LockMode.Size;
         public static WindowMode RenderMode { get; private set; } = WindowMode.Windowed;
 
         public static void SetWindowMode(WindowMode mode)
@@ -110,6 +110,8 @@ namespace Raymarcher
                             GameWindow.Instance.Width = s.Bounds.Width + _BordersSize.x;
                             GameWindow.Instance.Height = s.Bounds.Height + _BordersSize.y;
 
+                            RenderResolution = new Vector2I(s.Bounds.Width, s.Bounds.Height);
+                            //ResolutionLockMode = LockMode.None;
                         }
                         break;
 

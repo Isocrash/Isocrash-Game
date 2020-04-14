@@ -5,6 +5,7 @@
 #include <redef.h>
 #include <volume.h>
 #include <raymath.h>
+#include <voxel.h>
 
 typedef struct gpu_camera
 {
@@ -23,15 +24,17 @@ bool rm_render_raymarch(__global volume* volumes, size_t n, ray r, camera cam, h
 ray rm_render_rayDirection(camera cam, int2 pixel);
 color rm_render_skyColour(vector3 dir, vector3 sunDir);
 
-__kernel void rm_render_entry(__global camera* input, __global volume* shapes, __global size_t* n, __global byte* output)
+__kernel void rm_render_entry(__global camera* input, __global float* time, __global int3* modelSize, __global byte4* modelColors, __global byte* output)
 {   
+
     size_t i = get_global_id(0);
 
     camera cam = *input;
-    size_t objectAmount = *n;
+    
+    //size_t objectAmount = *n;
 
-    size_t x = i % 1024;
-    size_t y = i / 1024;
+    size_t x = i % cam.resolution.x;
+    size_t y = i / cam.resolution.x;
 
     int2 pixel;
     pixel.x = x;
@@ -59,31 +62,48 @@ __kernel void rm_render_entry(__global camera* input, __global volume* shapes, _
             col = rm_color_lerp(SunSetColour, SunDayColour, sqrt(sunAltitude * 2.0F));
         }
     }
+    
+    box3 box = rm_box3_create((float3) {0.0, 0.0F, 5.0F}, rm_quaternion_createFromEuler(/**time * 20.0F*/0.0F, 0.0F, 0.0F), (float3)(0.4F,0.6F,0.8F));
 
-    //size_t arraySize = 1;
+    
 
-    hit hi;
-    if(rm_render_raymarch(shapes, objectAmount, r, cam, &hi))
+    float3 ray3origin = (float3)(r.origin.x, r.origin.y, r.origin.z);
+    float3 ray3direction = (float3)(r.direction.x, r.direction.y, r.direction.z);
+
+    ray3 viewDir = rm_ray3_create(ray3origin, ray3direction);
+
+    //int3 size = modelSize
+    voxel sword = ic_voxel_create(*modelSize, modelColors);
+
+
+    float4 res;
+    float3 relDir;
+    float3 relPoint;
+    if(rm_box3_oob(viewDir, sword.box, &res, &relDir, &relPoint))
     {
-        float angle = rm_vector3_angleDegree(hi.normal, cam.mainDirection);
+        float3 uv = (float3)((relPoint.x + sword.size.x / 2.0F) / sword.size.x, (relPoint.y + sword.size.y / 2.0F) / sword.size.y, (relPoint.z + sword.size.z / 2.0F) / sword.size.z);
+        uv.y = 1.0F - uv.y;
+
+        byte4 receivedColor = ic_voxel_ray(sword, uv, relDir);
+
+        if(receivedColor.a != 0)
+        {
+            //color unlit = rm_color_createFromRGBA(uv.x, uv.y, uv.z, 0.5F);
+            color render = rm_color_createFromRGBA(receivedColor.r/255.0F, receivedColor.g/255.0F, receivedColor.b/255.0F,1.0F);//receivedColor.a/255.0F);
+            col = render;//rm_color_combineAlpha(unlit, render);
+        }
+        /*float distance = res.x;
+        float3 hitPoint = viewDir.origin + viewDir.direction * distance;
+        float3 normal = res.yzw;
+
+        //col = rm_color_createFromRGBA(distance, distance, distance, 1.0F);
+        float angle = rm_vector3_angleDegree((vector3){normal.x, normal.y, normal.z}, cam.mainDirection);
         float lightIntensity = cos(angle * -1.0F * DEG_TO_RAD);
 
         color diffuse = rm_color_multiply(rm_color_createFromKnown(white), lightIntensity);
-        col = diffuse;
-
-        r.origin = rm_vector3_add(hi.location, rm_vector3_multiply(hi.normal, cam.precision));
-        r.direction = rm_vector3_multiply(cam.mainDirection, 1.0F);
+        col = diffuse;*/
         
-        hi.hit = false;
-
-        // Shadows
-        //if(rm_render_raymarch(chunk, arraySize, r, cam, &hi))
-        //{
-        //    col = rm_color_createFromKnown(black);
-        //}
     }
-
-    
 
     output[i * 4 + 0] = col.b * 255;    //Blue
     output[i * 4 + 1] = col.g * 255;    //Green

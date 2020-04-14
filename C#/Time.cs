@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -17,12 +18,22 @@ namespace Raymarcher
         public static double DeltaTime { get; private set; }
         public static double FixedScale { get; set; } = 1.0D;
         public static double Scale { get; set; } = 1.0D;
+        public static double TimeSinceStart
+        {
+            get
+            {
+                return _mainClock.Elapsed.TotalSeconds;
+            }
+        }
         private static DateTime _LastUpdateTime { get; set; } = DateTime.Now;
+
+        private static Stopwatch _mainClock = new Stopwatch();
 
 
         [EngineInitializer(50)]
         public static void Initialize()
         {
+            _mainClock.Start();
             Updater.OnUpdate += () => ComputeDeltaTime();
         }
 

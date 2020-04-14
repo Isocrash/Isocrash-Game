@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Raymarcher;
+using Isocrash;
 
 namespace Raymarcher.Local_Only
 {
@@ -14,7 +15,7 @@ namespace Raymarcher.Local_Only
         {
             Malleable m = CreateCamera().Malleable;
             m.AddModule<FreeCamController>();//m.AddModule<CharacterController>();
-
+            m.AddModule<Game>();
 
 
             CreateSun();

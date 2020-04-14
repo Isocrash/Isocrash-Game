@@ -70,6 +70,7 @@ float rm_vector3_angleDegree(vector3 v1, vector3 v2)
     return rm_vector3_angle(v1, v2) * (180.0F / F_PI);
 }
 
+
 //__constant vector3 RM_VECTOR3_UNIT = { 1.0F, 1.0F, 1.0F };
 //__constant vector3 RM_VECTOR3_RIGHT = { 1.0F, 0.0F, 0.0F };
 //__constant vector3 RM_VECTOR3_LEFT = { -1.0F, 0.0F, 0.0F };

@@ -51,7 +51,7 @@ namespace Raymarcher
 
             foreach(KeyValuePair<EngineInitializer, MethodInfo> init in initmethod)
             {
-                Log.Print("Invoking " + init.Value.Name + " of " + init.Value.ReflectedType.Name + " (priority " + init.Key.Priority + ")");
+                //Log.Print("Invoking " + init.Value.Name + " of " + init.Value.ReflectedType.Name + " (priority " + init.Key.Priority + ")");
                 init.Value.Invoke(new Dummy(), null);
             }
         }

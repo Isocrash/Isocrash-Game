@@ -46,6 +46,7 @@ vector3 rm_vector3_rotateAroundPivot(vector3 point, vector3 pivot, quaternion ro
     return rm_vector3_add(dir, pivot);
 }
 
+
 vector3 rm_quaternion_toEuler(quaternion q)
 {
     vector3 angles;
@@ -72,13 +73,26 @@ vector3 rm_quaternion_toEuler(quaternion q)
     float cosy_cosp = 1.0F - 2.0F * (q.y * q.y + q.z * q.z);
     angles.z = atan2(siny_cosp, cosy_cosp);
 
-    return rm_vector3_multiply(angles , 180.0F / F_PI);
+    //if(angles.x < 0.0F) angles.x = -angles.x;
+    //if(angles.y < 0.0F) angles.y = -angles.y;
+    if(angles.z < 0.0F) angles.z = -angles.z;
+
+    return rm_vector3_multiply(angles , RAD_TO_DEG);
 }
 
 
 // Source : https://referencesource.microsoft.com/System.Numerics/System/Numerics/Quaternion.cs.html#062fb725b5ca1d1e
 quaternion rm_quaternion_createFromEuler(float x, float y, float z)
 {
+
+    x = fmod(x, 360.0F);
+    y = fmod(y, 360.0F);
+    z = fmod(z, 360.0F);
+
+    x *= DEG_TO_RAD;
+    y *= DEG_TO_RAD;
+    z *= DEG_TO_RAD;
+
     //  Roll first, about axis the object is facing, then
     //  pitch upward, then yaw to face into the new heading
     float sr, cr, sp, cp, sy, cy;
@@ -103,5 +117,20 @@ quaternion rm_quaternion_createFromEuler(float x, float y, float z)
 
     return q;
 
+}
+
+quaternion rm_quaternion_inverse(quaternion value)
+{
+    quaternion ans = rm_quaternion_create(0.0F,0.0F,0.0F,1.0F);
+ 
+    float ls = value.x * value.x + value.y * value.y + value.z * value.z + value.w * value.w;
+    float invNorm = 1.0f / ls;
+ 
+    ans.x = -value.x * invNorm;
+    ans.y = -value.y * invNorm;
+    ans.z = -value.z * invNorm;
+    ans.w = value.w * invNorm;
+ 
+    return ans;
 }
 

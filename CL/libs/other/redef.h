@@ -5,8 +5,15 @@
 #define bool _Bool
 #endif
 
-typedef unsigned char byte;
+typedef uchar byte;
 typedef char* string;
+typedef struct uchar4
+{
+    uchar r;
+    uchar g;
+    uchar b;
+    uchar a;
+} byte4;
 
 #endif
 

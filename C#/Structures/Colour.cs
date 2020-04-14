@@ -71,7 +71,7 @@ namespace Raymarcher
                     case 1: return G;
                     case 2: return B;
                     case 3: return A;
-                    default: return 0;
+                    default: throw new IndexOutOfRangeException();
                 }
             }
         }

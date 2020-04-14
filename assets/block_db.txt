@@ -1,0 +1,4 @@
+isocrash:air
+isocrash:grass
+isocrash:dirt
+isocrash:bedrock

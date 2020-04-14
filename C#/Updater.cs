@@ -12,10 +12,11 @@ namespace Raymarcher
     {
         private static readonly Stopwatch _Watch = new Stopwatch();
 
-        [EngineInitializer(int.MaxValue - 10)]
+        [EngineInitializer(int.MaxValue - 100)]
         public static void InitializeThread()
         {
             OnEndUpdate += RefreshInfos;
+            OnPostRender += PostRenderFPS;
 
             Thread tf = new Thread(FixedUpdateLoop);
             tf.Priority = ThreadPriority.Highest;
@@ -26,19 +27,36 @@ namespace Raymarcher
             tnf.Priority = ThreadPriority.Highest;
             tnf.IsBackground = true;
             tnf.Start();
+
         }
 
+        private static double timeSinceLastFPS = 1.0D;
+        private static int usedFPS = 0;
+        private static int frameCount = 0;
+        private static double refreshTime = 0.5D;
         private static void RefreshInfos()
         {
             Entry.ExecuteOnMainThread(() =>
             {
+                timeSinceLastFPS += Time.DeltaTime;
                 double updateTime = _Watch.Elapsed.TotalMilliseconds;
 
                 int fps = (int)Math.Round(1D / updateTime * 1000D, 0);
-                double msRenderTime = Math.Round(Rendering.Renderer.RenderTime, 2);
 
-                GameWindow.Instance.lbFPS.Text = /*fps + " FPS (" + Math.Round(updateTime, 2) + "ms)" + Environment.NewLine +*/ "Render time " + msRenderTime + "ms";
+                if(timeSinceLastFPS >= refreshTime)
+                {
+                    timeSinceLastFPS = 0.0D;
+                    usedFPS = (int)(frameCount / refreshTime);
+                    frameCount = 0;
+                }
+
+                //double msRenderTime = Math.Round(Rendering.Renderer.RenderTime, 2);
+                GameWindow.Instance.lbFPS.Text = usedFPS + " FPS\nAngle: " + Math.Round((Time.TimeSinceStart * 20) % 360) + "°";
             });
+        }
+        private static void PostRenderFPS()
+        {
+            frameCount++;
         }
 
 
@@ -86,7 +104,7 @@ namespace Raymarcher
                     {
                         double limit = 1.0D / Graphics.FrameRateLimit;
 
-                        double timeToWait = limit - secs;
+                        double timeToWait = Math.Abs(limit - secs);
 
                         if (timeToWait > 0)
                         {
@@ -138,22 +156,19 @@ namespace Raymarcher
                     if (!mod.Enabled) continue;
                     mod.PreUpdate();
                 }
-                if (OnUpdate != null)
-                    OnUpdate.Invoke();
+                OnUpdate?.Invoke();
                 foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.Update();
                 }
-                if (OnPostUpdate != null)
-                    OnPostUpdate.Invoke();
+                OnPostUpdate?.Invoke();
                 foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
                     mod.PostUpdate();
                 }
-                if (OnEndUpdate != null)
-                    OnEndUpdate.Invoke();
+                OnEndUpdate?.Invoke();
                 foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;
@@ -165,8 +180,7 @@ namespace Raymarcher
                     if (!mod.Enabled) continue;
                     mod.OnCameraRender();
                 }
-                if (OnPostRender != null)
-                    OnPostRender.Invoke();
+                OnPostRender?.Invoke();
                 /*foreach (Module mod in Module._LoadedModules.ToArray())
                 {
                     if (!mod.Enabled) continue;

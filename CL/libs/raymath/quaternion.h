@@ -17,6 +17,7 @@ vector3 rm_quaternion_multiply(quaternion q, vector3 v);
 vector3 rm_vector3_rotateAroundPivot(vector3 point, vector3 pivot, quaternion rotation);
 vector3 rm_quaternion_toEuler(quaternion q);
 quaternion rm_quaternion_createFromEuler(float x, float y, float z);
+quaternion rm_quaternion_inverse(quaternion value);
 
 #endif
 

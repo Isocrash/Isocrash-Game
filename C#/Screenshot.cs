@@ -11,7 +11,7 @@ namespace Raymarcher
     public static class Screenshot
     {
 
-        private static bool ScreenshotAsked = false;
+        private static bool ScreenshotAsked { get; set; } = false;
         [EngineInitializer(1484)]
         public static void Init()
         {
@@ -25,7 +25,7 @@ namespace Raymarcher
             string path = Path.Combine(File.Root, File.GetPath(FolderType.Screenshots));
 
             int n = Directory.GetFiles(path, "*.png").Count();
-            Camera.Main.RenderImage.Save(path + $@"\screenshot{n}.png", System.Drawing.Imaging.ImageFormat.Png);
+            Camera.Main.RenderImage.Save(path + $@"\screenshot{n+1}.png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public static void CheckForScreens()
