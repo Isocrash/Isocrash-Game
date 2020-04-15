@@ -32,6 +32,8 @@ namespace Raymarcher
 
         private static double timeSinceLastFPS = 1.0D;
         private static int usedFPS = 0;
+        private static int usedFPSRender = 0;
+        private static double usedMSRender = 0;
         private static int frameCount = 0;
         private static double refreshTime = 0.5D;
         private static void RefreshInfos()
@@ -42,16 +44,19 @@ namespace Raymarcher
                 double updateTime = _Watch.Elapsed.TotalMilliseconds;
 
                 int fps = (int)Math.Round(1D / updateTime * 1000D, 0);
+                double msRender = Math.Round(Rendering.Renderer.RenderTime, 2);
 
                 if(timeSinceLastFPS >= refreshTime)
                 {
                     timeSinceLastFPS = 0.0D;
                     usedFPS = (int)(frameCount / refreshTime);
+                    usedFPSRender = (int)Math.Round(1D / Rendering.Renderer.RenderTime * 1000D, 0);
+                    usedMSRender = msRender;
                     frameCount = 0;
                 }
 
                 //double msRenderTime = Math.Round(Rendering.Renderer.RenderTime, 2);
-                GameWindow.Instance.lbFPS.Text = usedFPS + " FPS\nAngle: " + Math.Round((Time.TimeSinceStart * 20) % 360) + "°";
+                GameWindow.Instance.lbFPS.Text = usedFPS + " FPS";
             });
         }
         private static void PostRenderFPS()

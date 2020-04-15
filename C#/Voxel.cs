@@ -77,5 +77,37 @@ namespace Raymarcher
 
             return bm;
         }
+
+        public static Voxel GenerateDebug(int3 size)
+        {
+            Voxel voxel = new Voxel(size);
+
+            for (int z = 0; z < size.z; z++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    for (int x = 0; x < size.x; x++)
+                    {
+                        Colour256 col256 = new Colour256(
+                            r: x / ((double)size.x-1),
+                            g: 1.0D - (y / ((double)size.y-1)),
+                            b: z / ((double)size.z - 1),
+                            a: 1.0D//(z % 2.0F == 0 ? 1.0D : 0.0D)
+                            
+                            );
+
+                        if (x % 2 == 0) col256.A = 0.0D;
+                        if (y % 2 == 0) col256.A = 0.0D;
+                        if (z % 2 == 0) col256.A = 0.0D;
+
+                        Colour32 col32 = (Colour32)col256;
+
+                        voxel[x, y, z] = col256;
+                    }
+                }
+            }
+
+            return voxel;
+        }
     }
 }

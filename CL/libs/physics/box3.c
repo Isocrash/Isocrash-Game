@@ -72,7 +72,15 @@ bool rm_box3_oob(
         float3 normal = -sign(rdd) * step(t1.yzx, t1.xyz) * step(t1.zxy,t1.xyz);
         //normal = rm_mat4_mult_float4(txi, (float4)(normal, 0.0F)).xyz;
         *receivedRelDir = rdd;
-        *receivedRelPoint = (ro + rd * tN) - box.center;
+        if(tN > 0.0F) //if outside
+        {
+            *receivedRelPoint = (ro + rd * tN) - box.center;
+        }
+        else
+        {
+            *receivedRelPoint = ro - box.center;  
+        }
+        
         *result = (float4)(tN, normal);
 
         return true;

@@ -26,7 +26,8 @@ color rm_render_skyColour(vector3 dir, vector3 sunDir);
 
 __kernel void rm_render_entry(__global camera* input, __global float* time, __global int3* modelSize, __global byte4* modelColors, __global byte* output)
 {   
-
+    //while(true)
+    //{
     size_t i = get_global_id(0);
 
     camera cam = *input;
@@ -63,34 +64,49 @@ __kernel void rm_render_entry(__global camera* input, __global float* time, __gl
         }
     }
     
-    box3 box = rm_box3_create((float3) {0.0, 0.0F, 5.0F}, rm_quaternion_createFromEuler(/**time * 20.0F*/0.0F, 0.0F, 0.0F), (float3)(0.4F,0.6F,0.8F));
+    //box3 box = rm_box3_create((float3) {0.0, 0.0F, -5.0F}, rm_quaternion_createFromEuler(/**time * 20.0F*/0.0F, 0.0F, 0.0F), (float3)(0.4F,0.6F,0.8F));
 
-    
+    quaternion modelRotation = rm_quaternion_createFromEuler(/**time * 20.0F*/0.0F, 0.0F, 0.0F);
 
     float3 ray3origin = (float3)(r.origin.x, r.origin.y, r.origin.z);
     float3 ray3direction = (float3)(r.direction.x, r.direction.y, r.direction.z);
 
     ray3 viewDir = rm_ray3_create(ray3origin, ray3direction);
 
-    //int3 size = modelSize
-    voxel sword = ic_voxel_create(*modelSize, modelColors);
+    voxel model = ic_voxel_create_unit(*modelSize, modelColors, 
+    (float3)
+    (1.0F),
+    
+    
+    
+    
+     modelRotation, (float3)(0.0F, 0.0F, 5.0F));
 
 
     float4 res;
     float3 relDir;
     float3 relPoint;
-    if(rm_box3_oob(viewDir, sword.box, &res, &relDir, &relPoint))
+    if(rm_box3_oob(viewDir, model.box, &res, &relDir, &relPoint))
     {
-        float3 uv = (float3)((relPoint.x + sword.size.x / 2.0F) / sword.size.x, (relPoint.y + sword.size.y / 2.0F) / sword.size.y, (relPoint.z + sword.size.z / 2.0F) / sword.size.z);
-        uv.y = 1.0F - uv.y;
+        /*float3 uv = (float3)(
+            (relPoint.x + model.box.extents.x) / model.resolution.x,
+            (relPoint.y + model.box.extents.y) / model.resolution.y,
+            (relPoint.z + model.box.extents.z) / model.resolution.z
+        );*/
+        
+        
+        //(float3)((relPoint.x + model.size.x / 2.0F) / model.size.x, (relPoint.y + model.size.y / 2.0F) / model.size.y, (relPoint.z + model.size.z / 2.0F) / model.size.z);
+        //uv.y = 1.0F - uv.y;
+        //uv.z = 0.0F;
 
-        byte4 receivedColor = ic_voxel_ray(sword, uv, relDir);
+        ray3 relRay = rm_ray3_create(relPoint, relDir);
+        color receivedColor = ic_voxel_ray(model, relRay, 5.0F);
 
         if(receivedColor.a != 0)
         {
-            //color unlit = rm_color_createFromRGBA(uv.x, uv.y, uv.z, 0.5F);
-            color render = rm_color_createFromRGBA(receivedColor.r/255.0F, receivedColor.g/255.0F, receivedColor.b/255.0F,1.0F);//receivedColor.a/255.0F);
-            col = render;//rm_color_combineAlpha(unlit, render);
+            color unlit = rm_color_createFromRGBA(relDir.x, relDir.y, relDir.z, 0.0F);
+            //color render = rm_color_createFromRGBA(receivedColor.r/255.0F, receivedColor.g/255.0F, receivedColor.b/255.0F,1.0F);//receivedColor.a/255.0F);
+            col = rm_color_combineAlpha(receivedColor, col);
         }
         /*float distance = res.x;
         float3 hitPoint = viewDir.origin + viewDir.direction * distance;

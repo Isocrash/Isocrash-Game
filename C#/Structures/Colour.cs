@@ -9,10 +9,10 @@ namespace Raymarcher
         public const double MinValue = 0.0D;
         public const double MaxValue = 1.0D;
 
-        public double R { get; private set; }
-        public double G { get; private set; }
-        public double B { get; private set; }
-        public double A { get; private set; }
+        public double R { get; set; }
+        public double G { get; set; }
+        public double B { get; set; }
+        public double A { get; set; }
 
         public Colour256(double r, double g, double b, double a)
         {
@@ -43,6 +43,11 @@ namespace Raymarcher
         public static Colour256 operator *(Colour256 c, double v)
         {
             return new Colour256(c.R * v, c.G * v, c.B * v, c.A * v);
+        }
+
+        public override string ToString()
+        {
+            return $"RGBA256({this.R};{this.G};{this.B};{this.A})";
         }
 
         /*public override string ToString()
@@ -134,6 +139,11 @@ namespace Raymarcher
         public static implicit operator byte[](Colour32 colour)
         {
             return new byte[3] { colour.A, colour.G, colour.R };
+        }
+
+        public override string ToString()
+        {
+            return $"RGBA32({this.R};{this.G};{this.B};{this.A})";
         }
     }
 

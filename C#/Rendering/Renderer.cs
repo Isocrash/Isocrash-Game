@@ -45,14 +45,15 @@ namespace Raymarcher.Rendering
             }
 
             Vector2I res = Graphics.RenderResolution;
-            int pixelAmount = res.x * res.y;
+            int pixelXAmount = res.x;
+            int pixelYAmount = res.y;
 
             int amountOfObjects = 1;
 
             unsafe
             {
                 inputSize = sizeof(C_CAMERA);
-                outputSize = sizeof(byte) * res.x * res.y * 4;
+                outputSize = sizeof(byte) * pixelXAmount * pixelYAmount * 4;
             }
 
             UsedDevice = Cl.GetDeviceIDs(platforms[0], DeviceType.All, out error)[0];
@@ -111,7 +112,7 @@ namespace Raymarcher.Rendering
             Cl.SetKernelArg(kernel, 4, (IntPtr)intPtrSize, memOutput);
 
             //Cl.SetKernelArg(kernel, 2, new IntPtr(4), pixelAmount * 4);
-            workGroupSizePtr = new IntPtr[] { new IntPtr(pixelAmount) };
+            workGroupSizePtr = new IntPtr[] { new IntPtr(pixelXAmount * pixelYAmount) };
 
             
         }
@@ -131,7 +132,7 @@ namespace Raymarcher.Rendering
         public static Bitmap Bake(Camera camera)
         {
             bakeSW.Start();
-            Vector2I res = Graphics.RenderResolution;
+            Vector2I res = Graphics.GetRenderResolution();
             int totPixels = res.x * res.y;
             C_CAMERA cam = new C_CAMERA(camera);
 
@@ -140,10 +141,10 @@ namespace Raymarcher.Rendering
 
             float time = (float)Time.TimeSinceStart;
 
-            Bitmap image = new Bitmap("diamond_sword.png");
-            
-            Voxel sword = Voxel.CreateFromImage(image);
-            Voxel.ConvertToImage(sword).Save("C:/Users/Arthur/Desktop/debug.png");
+            /*Bitmap image = new Bitmap(
+                "assets/textures/2d/nord-vpn.png");*/
+
+            Voxel sword = Voxel.GenerateDebug(new int3(32, 32, 32));///Voxel.CreateFromImage(image);
             C_VOXEL model = new C_VOXEL(sword);
 
 
@@ -153,10 +154,6 @@ namespace Raymarcher.Rendering
             {
                 modelSizeSize = sizeof(int3);
                 modelColorsSize = sizeof(Colour32) * model.colors.Length;
-                //modelSize = sizeof(Colour32) * model.colors.Length + sizeof(int3) + sizeof(C_BOX);
-                //modelSize = sizeof(model);
-                //volumeSize = sizeof(C_VOLUME) * vols.Length;
-                //Log.Print("Objects size: " + volumes.Count + $" (Taking {volumeSize} bytes of memory)");
             }
 
             ErrorCode error = ErrorCode.Success;
@@ -184,6 +181,7 @@ namespace Raymarcher.Rendering
             
 
             byte[] bp = new byte[totPixels * 4];
+
             sw.Start();
             error = Cl.EnqueueNDRangeKernel(Queue, kernel, 1, null, workGroupSizePtr, null, 0, null, out event0);
 
@@ -201,11 +199,15 @@ namespace Raymarcher.Rendering
                 Log.Print("Error while rendering: " + execError.ToString());
                 //return new Bitmap(1, 1);
             }
-            //sw.Stop();
+            sw.Stop();
             RenderTime = sw.Elapsed.TotalMilliseconds;
-            //sw.Reset();
+            sw.Reset();
 
+            //Stopwatch swbm = new Stopwatch();
+            //swbm.Start();
             Bitmap bm = Imaging.RawToImage(bp, res.x, res.y, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            //swbm.Stop();
+            //Log.Print("Byte* to Bitmap => " + Math.Round(swbm.Elapsed.TotalMilliseconds,2) + "ms");
 
             //bakeSW.Stop();
             //Log.Print("Camera image bake took " + Math.Round(bakeSW.Elapsed.TotalMilliseconds, 2) + "ms");

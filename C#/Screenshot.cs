@@ -24,8 +24,8 @@ namespace Raymarcher
             Log.Print("Screenshot!!");
             string path = Path.Combine(File.Root, File.GetPath(FolderType.Screenshots));
 
-            int n = Directory.GetFiles(path, "*.png").Count();
-            Camera.Main.RenderImage.Save(path + $@"\screenshot{n+1}.png", System.Drawing.Imaging.ImageFormat.Png);
+            int n = Directory.GetFiles(path, "*.*").Count();
+            Camera.Main.RenderImage.Save(path + $@"\screenshot{n}.png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         public static void CheckForScreens()
